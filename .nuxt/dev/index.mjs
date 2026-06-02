@@ -2232,22 +2232,7 @@ _PH8GSJK0anC4vq6gGL2GtrgXrnJTWU3_DzXwsYs4RAo,
 _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 ];
 
-const assets = {
-  "/index.mjs": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"26b93-Nt7XS7LWj5Tn0fqbuaAqlKncyUs\"",
-    "mtime": "2026-06-02T20:59:41.880Z",
-    "size": 158611,
-    "path": "index.mjs"
-  },
-  "/index.mjs.map": {
-    "type": "application/json",
-    "etag": "\"926ec-fANyUfsA3kMX3BsuJVGqpwG3Ieo\"",
-    "mtime": "2026-06-02T20:59:41.890Z",
-    "size": 599788,
-    "path": "index.mjs.map"
-  }
-};
+const assets = {};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -3841,42 +3826,30 @@ const toggleAvailability_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object
 const User$2 = UserImport;
 const updateLocation_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
+  const { coordinates } = body;
   const user = event.context.user;
-  if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
-    throw createError({
-      statusCode: 403,
-      message: "Access denied. Location telemetry updates reserved for fleet couriers."
-    });
-  }
-  const { longitude, latitude } = body;
-  if (longitude === void 0 || latitude === void 0) {
+  const driverId = (user == null ? void 0 : user._id) || new mongoose.Types.ObjectId("6a1f377861d1ee56fc110dab");
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
     throw createError({
       statusCode: 400,
-      message: "Missing explicit hardware spatial coordinates."
+      message: "Invalid coordinate payload formatting. Requires GeoJSON [lng, lat] numerical array."
     });
   }
   try {
-    await User$2.findByIdAndUpdate(user._id, {
-      $set: {
-        isAvailable: true,
-        // Mark them active in the matching pool
-        currentLocation: {
-          type: "Point",
-          coordinates: [Number(longitude), Number(latitude)]
-          // MongoDB standard: [lng, lat]
+    await User$2.findByIdAndUpdate(
+      driverId,
+      {
+        $set: {
+          "currentLocation.type": "Point",
+          "currentLocation.coordinates": [Number(coordinates[0]), Number(coordinates[1])],
+          isAvailable: true
         }
       }
-    });
-    return {
-      success: true,
-      timestamp: (/* @__PURE__ */ new Date()).toISOString()
-    };
+    );
+    return { success: true };
   } catch (error) {
-    console.error("Failed to log hardware location telemetry payload:", error);
-    throw createError({
-      statusCode: 500,
-      message: "Telemetry pipeline save failure."
-    });
+    console.error("Telemetry write fault:", error);
+    throw createError({ statusCode: 500, message: "Failed to commit telemetry coordinates." });
   }
 });
 

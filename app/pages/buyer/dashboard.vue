@@ -175,5 +175,36 @@ onMounted(() => {
 
       </template>
     </main>
+
+    <!-- STICKY MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-safe shadow-lg z-40">
+      <div class="max-w-md mx-auto grid grid-cols-2 h-16 text-center">
+        
+        <!-- Tab 1: Workshop Fleet Command Center -->
+        <button 
+          @click="$router.push('/buyer/dashboard')"
+          class="flex flex-col items-center justify-center space-y-1 transition-colors select-none"
+          :class="$route.path === '/buyer/dashboard' ? 'text-orange-500 font-black' : 'text-gray-400 hover:text-gray-600'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+          <span class="text-[10px] uppercase tracking-wider">Fleet Hub</span>
+        </button>
+
+        <!-- Tab 2: Drop a Fresh Parts Hot-Shot Request -->
+        <button 
+          @click="$router.push('/buyer/order')"
+          class="flex flex-col items-center justify-center space-y-1 transition-colors select-none"
+          :class="$route.path === '/buyer/order' ? 'text-orange-500 font-black' : 'text-gray-400 hover:text-gray-600'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          <span class="text-[10px] uppercase tracking-wider">New Request</span>
+        </button>
+
+      </div>
+    </nav>
   </div>
 </template>

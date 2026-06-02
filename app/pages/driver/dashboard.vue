@@ -310,5 +310,36 @@ onUnmounted(() => {
 
       </div>
     </main>
+
+        <!-- STICKY MOBILE BOTTOM NAVIGATION BAR -->
+        <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-safe shadow-lg z-40">
+      <div class="max-w-md mx-auto grid grid-cols-2 h-16 text-center">
+        
+        <!-- Tab 1: Live Radar Dispatches -->
+        <button 
+          @click="$router.push('/driver/dashboard')"
+          class="flex flex-col items-center justify-center space-y-1 transition-colors select-none"
+          :class="$route.path === '/driver/dashboard' ? 'text-orange-500 font-black' : 'text-gray-400 hover:text-gray-600'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-[10px] uppercase tracking-wider">Radar Dash</span>
+        </button>
+
+        <!-- Tab 2: Archival Payout History Logs -->
+        <button 
+          @click="$router.push('/driver/history')"
+          class="flex flex-col items-center justify-center space-y-1 transition-colors select-none"
+          :class="$route.path === '/driver/history' ? 'text-orange-500 font-black' : 'text-gray-400 hover:text-gray-600'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-[10px] uppercase tracking-wider">Earnings Log</span>
+        </button>
+
+      </div>
+    </nav>
   </div>
 </template>
