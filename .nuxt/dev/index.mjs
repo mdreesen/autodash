@@ -2201,25 +2201,50 @@ function onConsoleLog(callback) {
 	consola$1.wrapConsole();
 }
 
+function defineNitroPlugin(def) {
+  return def;
+}
+
+const _PH8GSJK0anC4vq6gGL2GtrgXrnJTWU3_DzXwsYs4RAo = defineNitroPlugin(async (nitroApp) => {
+  const config = useRuntimeConfig();
+  const uri = config.mongodbUri || process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/autodash";
+  try {
+    await mongoose.connect(uri, {
+      maxPoolSize: 10,
+      // Allows up to 10 parallel queries to run at once
+      serverSelectionTimeoutMS: 5e3,
+      socketTimeoutMS: 45e3
+    });
+    console.log("\u{1F680} [Database Core] Global MongoDB connection pool initialized successfully.");
+  } catch (error) {
+    console.error("\u274C [Database Core] Critical fault initializing global MongoDB pool:", error);
+  }
+  nitroApp.hooks.hook("close", async () => {
+    await mongoose.disconnect();
+    console.log("\u{1F4E1} [Database Core] Global MongoDB connection pool closed cleanly.");
+  });
+});
+
 const plugins = [
   _9asCNLlq8BadaY8pW_XVj4YouE5SwlOSbuZyUnAu98,
 _jv22zaODePiDNTIC0UqWY7BqaTBXQWV6bdUcr_ewg,
+_PH8GSJK0anC4vq6gGL2GtrgXrnJTWU3_DzXwsYs4RAo,
 _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 ];
 
 const assets = {
   "/index.mjs": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"25468-3uAIjeKhgBgi2iasOxAAvZJXKBU\"",
-    "mtime": "2026-06-02T20:29:45.888Z",
-    "size": 152680,
+    "etag": "\"26b93-Nt7XS7LWj5Tn0fqbuaAqlKncyUs\"",
+    "mtime": "2026-06-02T20:59:41.880Z",
+    "size": 158611,
     "path": "index.mjs"
   },
   "/index.mjs.map": {
     "type": "application/json",
-    "etag": "\"8dc95-8wN6aYbl9d+pkDav9dlE8/rZ8ao\"",
-    "mtime": "2026-06-02T20:29:45.888Z",
-    "size": 580757,
+    "etag": "\"926ec-fANyUfsA3kMX3BsuJVGqpwG3Ieo\"",
+    "mtime": "2026-06-02T20:59:41.890Z",
+    "size": 599788,
     "path": "index.mjs.map"
   }
 };
@@ -2787,12 +2812,15 @@ async function getIslandContext(event) {
 
 const _lazy_Vz405A = () => Promise.resolve().then(function () { return login_post$1; });
 const _lazy_vHsfFA = () => Promise.resolve().then(function () { return logout_post$1; });
-const _lazy_BSCW5h = () => Promise.resolve().then(function () { return me_get$1; });
+const _lazy_BSCW5h = () => Promise.resolve().then(function () { return me_get$3; });
 const _lazy_rVfMzz = () => Promise.resolve().then(function () { return mockLogin_get$1; });
 const _lazy_VxJEsV = () => Promise.resolve().then(function () { return signup_post$1; });
+const _lazy_jVShMm = () => Promise.resolve().then(function () { return dashboard_get$1; });
 const _lazy_V34zil = () => Promise.resolve().then(function () { return index_get$5; });
 const _lazy_4LDz9z = () => Promise.resolve().then(function () { return availableOrders_get$1; });
 const _lazy_eUOl6G = () => Promise.resolve().then(function () { return fetchJobs_get$1; });
+const _lazy_Qy4D5s = () => Promise.resolve().then(function () { return history_get$1; });
+const _lazy_8WTohe = () => Promise.resolve().then(function () { return me_get$1; });
 const _lazy_rpNvxn = () => Promise.resolve().then(function () { return toggleAvailability_post$1; });
 const _lazy_u1kooO = () => Promise.resolve().then(function () { return updateLocation_post$1; });
 const _lazy_YBdUi9 = () => Promise.resolve().then(function () { return index_get$3; });
@@ -2815,9 +2843,12 @@ const handlers = [
   { route: '/api/auth/me', handler: _lazy_BSCW5h, lazy: true, middleware: false, method: "get" },
   { route: '/api/auth/mock-login', handler: _lazy_rVfMzz, lazy: true, middleware: false, method: "get" },
   { route: '/api/auth/signup', handler: _lazy_VxJEsV, lazy: true, middleware: false, method: "post" },
+  { route: '/api/buyer/dashboard', handler: _lazy_jVShMm, lazy: true, middleware: false, method: "get" },
   { route: '/api/buyer/track-order/:id', handler: _lazy_V34zil, lazy: true, middleware: false, method: "get" },
   { route: '/api/driver/available-orders', handler: _lazy_4LDz9z, lazy: true, middleware: false, method: "get" },
   { route: '/api/driver/fetch-jobs', handler: _lazy_eUOl6G, lazy: true, middleware: false, method: "get" },
+  { route: '/api/driver/history', handler: _lazy_Qy4D5s, lazy: true, middleware: false, method: "get" },
+  { route: '/api/driver/me', handler: _lazy_8WTohe, lazy: true, middleware: false, method: "get" },
   { route: '/api/driver/toggle-availability', handler: _lazy_rpNvxn, lazy: true, middleware: false, method: "post" },
   { route: '/api/driver/update-location', handler: _lazy_u1kooO, lazy: true, middleware: false, method: "post" },
   { route: '/api/orders/:id', handler: _lazy_YBdUi9, lazy: true, middleware: false, method: "get" },
@@ -3240,7 +3271,7 @@ const userSchema = new Schema({
 userSchema.index({ "currentLocation.coordinates": "2dsphere" });
 const UserImport = mongoose.models.User || mongoose.model("User", userSchema);
 
-const User$6 = UserImport;
+const User$7 = UserImport;
 const login_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { email, password } = body;
@@ -3248,7 +3279,7 @@ const login_post = defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: "Credentials missing." });
   }
   try {
-    const user = await User$6.findOne({ email });
+    const user = await User$7.findOne({ email });
     if (!user) {
       throw createError({ statusCode: 401, message: "Invalid authentication credentials." });
     }
@@ -3292,15 +3323,15 @@ const logout_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePrope
   default: logout_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const me_get = defineEventHandler((event) => {
+const me_get$2 = defineEventHandler((event) => {
   return {
     user: event.context.user || null
   };
 });
 
-const me_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const me_get$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
-  default: me_get
+  default: me_get$2
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const mockLogin_get = defineEventHandler(async (event) => {
@@ -3337,7 +3368,7 @@ const connectDB = async () => {
   }
 };
 
-const User$5 = UserImport;
+const User$6 = UserImport;
 const signup_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { name, email, password, role } = body;
@@ -3346,13 +3377,13 @@ const signup_post = defineEventHandler(async (event) => {
   }
   try {
     await connectDB();
-    const existingUser = await User$5.findOne({ email });
+    const existingUser = await User$6.findOne({ email });
     if (existingUser) {
       throw createError({ statusCode: 409, message: "An account with this email already exists." });
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = await User$5.create({
+    const newUser = await User$6.create({
       name,
       email,
       password: hashedPassword,
@@ -3473,8 +3504,55 @@ const partsOrderSchema = new Schema({
 partsOrderSchema.index({ "deliveryLocation.geoPoint": "2dsphere" });
 const PartsOrderImport = mongoose.models.PartsOrder || mongoose.model("PartsOrder", partsOrderSchema);
 
-const PartsOrder$a = PartsOrderImport;
-const User$4 = UserImport;
+const PartsOrder$d = PartsOrderImport;
+const dashboard_get = defineEventHandler(async (event) => {
+  var _a, _b, _c, _d, _e, _f, _g;
+  try {
+    const allOrders = await PartsOrder$d.find().sort({ createdAt: -1 }).lean();
+    const liveDispatches = [];
+    const pastDeliveries = [];
+    for (const order of allOrders) {
+      const rawStore = (((_a = order.supplier) == null ? void 0 : _a.storeName) || "").toLowerCase();
+      let cleanStoreName = "AutoZone Auto Parts";
+      if (rawStore.includes("oreilly")) cleanStoreName = "O'Reilly Auto Parts";
+      if (rawStore.includes("napa")) cleanStoreName = "NAPA Auto Parts";
+      const formattedOrder = {
+        _id: order._id.toString(),
+        timestamp: order.createdAt || /* @__PURE__ */ new Date(),
+        supplierName: cleanStoreName,
+        partsManifest: order.manifestText || "Commercial Components",
+        vehicleInfo: `${((_b = order.vehicle) == null ? void 0 : _b.year) || ""} ${((_c = order.vehicle) == null ? void 0 : _c.make) || ""} ${((_d = order.vehicle) == null ? void 0 : _d.model) || "Fleet Unit"}`.trim(),
+        totalCost: ((_e = order.pricing) == null ? void 0 : _e.total) || ((_f = order.pricing) == null ? void 0 : _f.deliveryFee) || 24.5,
+        status: order.status || "placed",
+        bayInstructions: ((_g = order.deliveryLocation) == null ? void 0 : _g.bayInstructions) || "Main Repair Bay"
+      };
+      if (order.status === "placed" || order.status === "accepted") {
+        liveDispatches.push(formattedOrder);
+      } else if (order.status === "completed") {
+        pastDeliveries.push(formattedOrder);
+      }
+    }
+    return {
+      success: true,
+      live: liveDispatches,
+      history: pastDeliveries
+    };
+  } catch (error) {
+    console.error("\u274C Failed to compile buyer fleet matrix:", error);
+    throw createError({
+      statusCode: 500,
+      message: error.message || "Internal fleet processing database fault."
+    });
+  }
+});
+
+const dashboard_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: dashboard_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$c = PartsOrderImport;
+const User$5 = UserImport;
 const index_get$4 = defineEventHandler(async (event) => {
   var _a;
   const user = event.context.user;
@@ -3483,7 +3561,7 @@ const index_get$4 = defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: "Authentication missing." });
   }
   try {
-    const order = await PartsOrder$a.findById(orderId).lean();
+    const order = await PartsOrder$c.findById(orderId).lean();
     if (!order) {
       throw createError({ statusCode: 404, message: "Order manifest not found." });
     }
@@ -3493,7 +3571,7 @@ const index_get$4 = defineEventHandler(async (event) => {
     let driverCoordinates = null;
     let driverName = "Searching for nearest driver...";
     if (order.driverId) {
-      const assignedDriver = await User$4.findById(order.driverId).select("name currentLocation").lean();
+      const assignedDriver = await User$5.findById(order.driverId).select("name currentLocation").lean();
       if (assignedDriver) {
         driverName = assignedDriver.name;
         if ((_a = assignedDriver.currentLocation) == null ? void 0 : _a.coordinates) {
@@ -3524,7 +3602,7 @@ const index_get$5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
   default: index_get$4
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$9 = PartsOrderImport;
+const PartsOrder$b = PartsOrderImport;
 const availableOrders_get = defineEventHandler(async (event) => {
   const user = event.context.user;
   if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
@@ -3534,7 +3612,7 @@ const availableOrders_get = defineEventHandler(async (event) => {
     });
   }
   try {
-    const openOrders = await PartsOrder$9.find({ status: "placed" }).sort({ createdAt: -1 }).populate("buyerId", "name").lean();
+    const openOrders = await PartsOrder$b.find({ status: "placed" }).sort({ createdAt: -1 }).populate("buyerId", "name").lean();
     return {
       success: true,
       orders: openOrders
@@ -3553,10 +3631,10 @@ const availableOrders_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.def
   default: availableOrders_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$8 = PartsOrderImport;
+const PartsOrder$a = PartsOrderImport;
 const fetchJobs_get = defineEventHandler(async (event) => {
   try {
-    const activeOffers = await PartsOrder$8.find({
+    const activeOffers = await PartsOrder$a.find({
       status: "placed",
       driverId: null
     }).sort({ createdAt: -1 }).lean();
@@ -3607,6 +3685,106 @@ const fetchJobs_get = defineEventHandler(async (event) => {
 const fetchJobs_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: fetchJobs_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$9 = PartsOrderImport;
+const history_get = defineEventHandler(async (event) => {
+  const user = event.context.user;
+  const driverId = (user == null ? void 0 : user._id) || new mongoose.Types.ObjectId("6a1f377861d1ee56fc110dab");
+  try {
+    const totalHistoryLogs = await PartsOrder$9.find({ driverId }).sort({ createdAt: -1 }).lean();
+    let totalCompletions = 0;
+    let totalLifetimePayout = 0;
+    const formattedOrders = totalHistoryLogs.map((order) => {
+      var _a, _b, _c, _d, _e, _f;
+      const driverCut = ((_a = order.pricing) == null ? void 0 : _a.driverPayout) || 0;
+      const isDone = order.status === "completed";
+      if (isDone) {
+        totalCompletions++;
+        totalLifetimePayout += driverCut;
+      }
+      const rawStore = (((_b = order.supplier) == null ? void 0 : _b.storeName) || "").toLowerCase();
+      let cleanStoreName = "AutoZone Auto Parts";
+      if (rawStore.includes("oreilly")) cleanStoreName = "O'Reilly Auto Parts";
+      if (rawStore.includes("napa")) cleanStoreName = "NAPA Auto Parts";
+      return {
+        _id: order._id.toString(),
+        timestamp: order.createdAt || /* @__PURE__ */ new Date(),
+        vehicleSpecs: `${((_c = order.vehicle) == null ? void 0 : _c.year) || ""} ${((_d = order.vehicle) == null ? void 0 : _d.make) || ""} ${((_e = order.vehicle) == null ? void 0 : _e.model) || "Vehicle"}`.trim(),
+        supplier: cleanStoreName,
+        destination: ((_f = order.deliveryLocation) == null ? void 0 : _f.bayInstructions) || "Fleet Workshop",
+        manifestText: order.manifestText || "Commercial Auto Components",
+        payout: Number(driverCut.toFixed(2)),
+        status: order.status || "placed"
+      };
+    });
+    return {
+      success: true,
+      metrics: {
+        completedRuns: totalCompletions,
+        lifetimeEarnings: Number(totalLifetimePayout.toFixed(2))
+      },
+      logs: formattedOrders
+    };
+  } catch (error) {
+    console.error("\u274C Failed to compile courier order history matrix:", error);
+    throw createError({
+      statusCode: 500,
+      message: error.message || "Failed to fetch historical logistics logs."
+    });
+  }
+});
+
+const history_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: history_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const User$4 = UserImport;
+const PartsOrder$8 = PartsOrderImport;
+const me_get = defineEventHandler(async (event) => {
+  var _a, _b, _c, _d, _e;
+  const user = event.context.user;
+  const driverId = (user == null ? void 0 : user._id) || new mongoose.Types.ObjectId("6a1f377861d1ee56fc110dab");
+  try {
+    const driverRecord = await User$4.findById(driverId).select("-password").lean();
+    if (!driverRecord) {
+      return { success: false, message: "Driver document footprint missing." };
+    }
+    const activeOrderRecord = await PartsOrder$8.findOne({
+      driverId,
+      status: "accepted"
+    }).lean();
+    let formattedActiveJob = null;
+    if (activeOrderRecord) {
+      formattedActiveJob = {
+        _id: activeOrderRecord._id.toString(),
+        nearestSupplier: ((_a = activeOrderRecord.supplier) == null ? void 0 : _a.storeName) === "oreilly" ? "O'Reilly Auto Parts" : ((_b = activeOrderRecord.supplier) == null ? void 0 : _b.storeName) === "napa" ? "NAPA Auto Parts" : "AutoZone Auto Parts",
+        destination: {
+          name: ((_c = activeOrderRecord.deliveryLocation) == null ? void 0 : _c.bayInstructions) || "Workshop Destination",
+          address: ((_d = activeOrderRecord.deliveryLocation) == null ? void 0 : _d.address) || "Address Missing"
+        },
+        pricing: ((_e = activeOrderRecord.pricing) == null ? void 0 : _e.deliveryFee) || 14.5,
+        status: activeOrderRecord.status
+      };
+    }
+    return {
+      success: true,
+      user: driverRecord,
+      activeOrder: formattedActiveJob
+    };
+  } catch (error) {
+    console.error("\u274C Driver profile hydration collapsed:", error);
+    throw createError({
+      statusCode: 500,
+      message: "Internal profile data lookup fault."
+    });
+  }
+});
+
+const me_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: me_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const User$3 = UserImport;

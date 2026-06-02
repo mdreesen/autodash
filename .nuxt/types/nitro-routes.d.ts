@@ -18,6 +18,9 @@ declare module "nitropack/types" {
     '/api/auth/signup': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/signup.post').default>>>>
     }
+    '/api/buyer/dashboard': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/buyer/dashboard.get').default>>>>
+    }
     '/api/buyer/track-order/:id': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/buyer/track-order/[id]/index.get').default>>>>
     }
@@ -26,6 +29,12 @@ declare module "nitropack/types" {
     }
     '/api/driver/fetch-jobs': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/fetch-jobs.get').default>>>>
+    }
+    '/api/driver/history': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/history.get').default>>>>
+    }
+    '/api/driver/me': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/me.get').default>>>>
     }
     '/api/driver/toggle-availability': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/toggle-availability.post').default>>>>

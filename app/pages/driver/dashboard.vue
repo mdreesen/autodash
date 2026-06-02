@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 // --- 1. DRIVER LIFE-CYCLE STATES ---
 const isOnline = ref(false)
@@ -7,12 +7,42 @@ const pendingOrders = ref([])
 const activeJob = ref(null)
 const isUpdatingStatus = ref(false)
 let pollingInterval = null
+let hardwareWatchId = null
 
-// --- 2. TOGGLE AVAILABILITY (MONGODB HANDSHAKE) ---
-async function toggleDutyStatus() {
-  isUpdatingStatus.value = true
+// --- 2. INITIALIZE AND SYNC STATE FROM MONGOOSE ---
+onMounted(async () => {
   try {
-    // Passes the status registration shift directly to the backend database handler
+    // Queries the server on initial page boot to discover real database state
+    const driverState = await $fetch('/api/driver/me')
+    
+    if (driverState.success && driverState.user) {
+      // 1. Sync the hardware switch position visually
+      isOnline.value = !!driverState.user.isAvailable
+      
+      // 2. If the user was left online, instantly kick off tracking pipelines
+      if (isOnline.value) {
+        startOrderPolling()
+        startHardwareLocationTracking()
+      }
+
+      // 3. Re-anchor their view if they refresh while mid-delivery run
+      if (driverState.activeOrder) {
+        activeJob.value = driverState.activeOrder
+        stopOrderPolling() // Lock radar down while actively delivering
+      }
+    }
+  } catch (err) {
+    console.error('Initialization handshake with cluster faulted:', err)
+  }
+})
+
+// --- 3. TOGGLE AVAILABILITY (MONGODB HANDSHAKE) ---
+async function toggleDutyStatus() {
+  // Prevent double clicks while pipeline processes database writes
+  if (isUpdatingStatus.value) return 
+  isUpdatingStatus.value = true
+  
+  try {
     const response = await $fetch('/api/driver/toggle-availability', {
       method: 'POST',
       body: { isAvailable: isOnline.value }
@@ -28,14 +58,13 @@ async function toggleDutyStatus() {
     }
   } catch (error) {
     console.error('Failed to cycle driver network registry:', error)
-    // Rollback checkbox toggle state if connection drops
-    isOnline.value = !isOnline.value
+    isOnline.value = !isOnline.value // Revert toggle state if request drops
   } finally {
     isUpdatingStatus.value = false
   }
 }
 
-// --- 3. LIVE ORDER POLLING RADAR DETECTOR ---
+// --- 4. LIVE ORDER POLLING RADAR DETECTOR ---
 async function pollPendingOrders() {
   if (!isOnline.value || activeJob.value) return
   try {
@@ -49,8 +78,8 @@ async function pollPendingOrders() {
 }
 
 function startOrderPolling() {
-  pollPendingOrders() // Run immediately on online shift
-  pollingInterval = setInterval(pollPendingOrders, 4000) // Re-fetch coordinates and requests every 4 seconds
+  pollPendingOrders()
+  pollingInterval = setInterval(pollPendingOrders, 4000)
 }
 
 function stopOrderPolling() {
@@ -60,7 +89,60 @@ function stopOrderPolling() {
   }
 }
 
-// --- 4. JOB LIFECYCLE INTERACTION ACTIONS ---
+// --- 5. REAL-TIME HARDWARE TELEMETRY STREAMING ---
+function startHardwareLocationTracking() {
+  if (!process.client || !navigator.geolocation) {
+    console.warn('⚠️ Geolocation sensors unavailable on this client device.')
+    return
+  }
+
+  hardwareWatchId = navigator.geolocation.watchPosition(
+    async (position) => {
+      const { longitude, latitude, heading, speed } = position.coords
+      console.log(`🛰️ [GPS Hardware] Motion detected: [${longitude}, ${latitude}]`)
+
+      try {
+        await $fetch('/api/driver/update-location', {
+          method: 'POST',
+          body: {
+            coordinates: [longitude, latitude],
+            heading: heading || 0,
+            speed: speed || 0
+          }
+        })
+      } catch (err) {
+        console.error('❌ Failed to stream hardware telemetry to server:', err)
+      }
+    },
+    (error) => {
+      console.error('❌ GPS sensor hardware fault:', error.message)
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  )
+}
+
+function stopHardwareLocationTracking() {
+  if (hardwareWatchId && typeof window !== 'undefined') {
+    navigator.geolocation.clearWatch(hardwareWatchId)
+    hardwareWatchId = null
+    console.log('📡 [GPS Hardware] Telemetry stream detached cleanly.')
+  }
+}
+
+// Watch duty status changes to bind/unbind hardware sensors and polling automatically
+watch(isOnline, (online) => {
+  if (online) {
+    startHardwareLocationTracking()
+  } else {
+    stopHardwareLocationTracking()
+  }
+})
+
+// --- 6. JOB LIFECYCLE INTERACTION ACTIONS ---
 async function acceptHotShotJob(orderId) {
   try {
     const data = await $fetch(`/api/orders/accept-job`, {
@@ -68,7 +150,6 @@ async function acceptHotShotJob(orderId) {
       body: { orderId }
     })
     if (data.success) {
-      // Pin targeted contract details straight to driver viewport
       activeJob.value = pendingOrders.value.find(o => o._id === orderId)
       pendingOrders.value = []
       stopOrderPolling()
@@ -85,15 +166,17 @@ async function completeDelivery() {
       body: { orderId: activeJob.value._id }
     })
     activeJob.value = null
-    // Instantly switch back on background radar loops if still online
     if (isOnline.value) startOrderPolling()
   } catch (error) {
     console.error('Failed to finalize delivery state:', error)
   }
 }
 
-// Lifecycle Memory Guard: Kill standard interval routines if user leaves page
-onUnmounted(() => stopOrderPolling())
+// Lifecycle Memory Guard
+onUnmounted(() => {
+  stopOrderPolling()
+  stopHardwareLocationTracking()
+})
 </script>
 
 <template>
@@ -136,7 +219,7 @@ onUnmounted(() => stopOrderPolling())
         <div class="space-y-1">
           <h3 class="text-sm font-extrabold text-gray-800 uppercase tracking-wide">You are Offline</h3>
           <p class="text-xs text-gray-400 max-w-[260px] mx-auto leading-normal">
-            Flip the duty toggle on the header navigation frame to start receiving incoming logistics offers across the valley.
+            Flip the duty toggle on the header navigation frame to start streaming live hardware telemetry and receive incoming logistics offers.
           </p>
         </div>
       </div>
@@ -148,7 +231,7 @@ onUnmounted(() => stopOrderPolling())
 
           <div class="flex items-center justify-between border-b border-white/10 pb-3">
             <div class="space-y-0.5">
-              <span class="text-[9px] uppercase font-black tracking-widest bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">Active Cargo Cargo</span>
+              <span class="text-[9px] uppercase font-black tracking-widest bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">Active Cargo Delivery</span>
               <p class="text-[10px] text-gray-500 font-mono">ID: {{ activeJob._id }}</p>
             </div>
             <div class="text-right">
