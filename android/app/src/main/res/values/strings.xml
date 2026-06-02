@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AutoDash</string>
+    <string name="title_activity_main">AutoDash</string>
+    <string name="package_name">com.yourdomain.autodash</string>
+    <string name="custom_url_scheme">com.yourdomain.autodash</string>
+</resources>

@@ -1,0 +1,5 @@
+{
+  "appId": "com.yourdomain.autodash",
+  "appName": "AutoDash",
+  "webDir": ".output/public"
+}
