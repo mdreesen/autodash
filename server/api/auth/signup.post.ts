@@ -6,6 +6,7 @@ import type { Model } from 'mongoose'
 import bcrypt from 'bcryptjs'
 import UserImport from '../../database/models/User'
 import { createSession } from '../../middleware/auth'
+import { connectDB } from "../../database/mongodb";
 
 const User = UserImport as Model<any>
 
@@ -18,6 +19,8 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    await connectDB();
+
     // 1. Ensure user doesn't already exist
     const existingUser = await User.findOne({ email })
     if (existingUser) {

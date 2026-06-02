@@ -1,5 +1,5 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { tmpdir } from 'node:os';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, createError, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, parseCookies, setCookie, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getResponseStatusText } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/h3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, createError, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, parseCookies, setCookie, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, deleteCookie, getResponseStatusText } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/h3/dist/index.mjs';
 import { Server } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
 import crypto$1 from 'node:crypto';
@@ -7,6 +7,7 @@ import { parentPort, threadId } from 'node:worker_threads';
 import { escapeHtml } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/@vue/shared/dist/shared.cjs.js';
 import viteNodeEntry_mjs from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/@nuxt/vite-builder/dist/vite-node-entry.mjs';
 import { viteNodeFetch } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/@nuxt/vite-builder/dist/vite-node.mjs';
+import bcrypt from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/bcryptjs/index.js';
 import mongoose, { Schema } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/mongoose/index.js';
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/vue-bundle-renderer/dist/runtime.mjs';
 import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, decodePath, withLeadingSlash, withoutTrailingSlash, encodePath, joinRelativeURL } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/ufo/dist/index.mjs';
@@ -2209,16 +2210,16 @@ _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 const assets = {
   "/index.mjs": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"1cc3c-tvlCOEsST4uE+V5XDKx239otdB0\"",
-    "mtime": "2026-06-02T03:17:43.379Z",
-    "size": 117820,
+    "etag": "\"25468-3uAIjeKhgBgi2iasOxAAvZJXKBU\"",
+    "mtime": "2026-06-02T20:29:45.888Z",
+    "size": 152680,
     "path": "index.mjs"
   },
   "/index.mjs.map": {
     "type": "application/json",
-    "etag": "\"71c27-ctia7w2KVjxmhP0Kzll2Iwk4FnA\"",
-    "mtime": "2026-06-02T03:17:43.379Z",
-    "size": 465959,
+    "etag": "\"8dc95-8wN6aYbl9d+pkDav9dlE8/rZ8ao\"",
+    "mtime": "2026-06-02T20:29:45.888Z",
+    "size": 580757,
     "path": "index.mjs.map"
   }
 };
@@ -2784,15 +2785,51 @@ async function getIslandContext(event) {
 	};
 }
 
+const _lazy_Vz405A = () => Promise.resolve().then(function () { return login_post$1; });
+const _lazy_vHsfFA = () => Promise.resolve().then(function () { return logout_post$1; });
+const _lazy_BSCW5h = () => Promise.resolve().then(function () { return me_get$1; });
 const _lazy_rVfMzz = () => Promise.resolve().then(function () { return mockLogin_get$1; });
+const _lazy_VxJEsV = () => Promise.resolve().then(function () { return signup_post$1; });
+const _lazy_V34zil = () => Promise.resolve().then(function () { return index_get$5; });
+const _lazy_4LDz9z = () => Promise.resolve().then(function () { return availableOrders_get$1; });
+const _lazy_eUOl6G = () => Promise.resolve().then(function () { return fetchJobs_get$1; });
+const _lazy_rpNvxn = () => Promise.resolve().then(function () { return toggleAvailability_post$1; });
+const _lazy_u1kooO = () => Promise.resolve().then(function () { return updateLocation_post$1; });
+const _lazy_YBdUi9 = () => Promise.resolve().then(function () { return index_get$3; });
+const _lazy_0SxUSI = () => Promise.resolve().then(function () { return status_post$1; });
+const _lazy_5tVYRD = () => Promise.resolve().then(function () { return acceptJob_post$1; });
+const _lazy_sqFzAA = () => Promise.resolve().then(function () { return accept_post$1; });
+const _lazy_hKeC5m = () => Promise.resolve().then(function () { return autoDispatchQuote_post$1; });
+const _lazy_VpmoE3 = () => Promise.resolve().then(function () { return calculateRate_post$1; });
+const _lazy_3v8rf4 = () => Promise.resolve().then(function () { return completeJob_post$1; });
 const _lazy_3a7_l7 = () => Promise.resolve().then(function () { return create_post$1; });
+const _lazy_Nm5O2A = () => Promise.resolve().then(function () { return track__id__get$1; });
+const _lazy_qcCVQj = () => Promise.resolve().then(function () { return index_get$1; });
 const _lazy_NmmIOD = () => Promise.resolve().then(function () { return renderer; });
 
 const handlers = [
   { route: '', handler: _2CySE0, lazy: false, middleware: true, method: undefined },
   { route: '', handler: _WPzoNn, lazy: false, middleware: true, method: undefined },
+  { route: '/api/auth/login', handler: _lazy_Vz405A, lazy: true, middleware: false, method: "post" },
+  { route: '/api/auth/logout', handler: _lazy_vHsfFA, lazy: true, middleware: false, method: "post" },
+  { route: '/api/auth/me', handler: _lazy_BSCW5h, lazy: true, middleware: false, method: "get" },
   { route: '/api/auth/mock-login', handler: _lazy_rVfMzz, lazy: true, middleware: false, method: "get" },
+  { route: '/api/auth/signup', handler: _lazy_VxJEsV, lazy: true, middleware: false, method: "post" },
+  { route: '/api/buyer/track-order/:id', handler: _lazy_V34zil, lazy: true, middleware: false, method: "get" },
+  { route: '/api/driver/available-orders', handler: _lazy_4LDz9z, lazy: true, middleware: false, method: "get" },
+  { route: '/api/driver/fetch-jobs', handler: _lazy_eUOl6G, lazy: true, middleware: false, method: "get" },
+  { route: '/api/driver/toggle-availability', handler: _lazy_rpNvxn, lazy: true, middleware: false, method: "post" },
+  { route: '/api/driver/update-location', handler: _lazy_u1kooO, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/:id', handler: _lazy_YBdUi9, lazy: true, middleware: false, method: "get" },
+  { route: '/api/orders/:id/status', handler: _lazy_0SxUSI, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/accept-job', handler: _lazy_5tVYRD, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/accept', handler: _lazy_sqFzAA, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/auto-dispatch-quote', handler: _lazy_hKeC5m, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/calculate-rate', handler: _lazy_VpmoE3, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/complete-job', handler: _lazy_3v8rf4, lazy: true, middleware: false, method: "post" },
   { route: '/api/orders/create', handler: _lazy_3a7_l7, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/track-:id', handler: _lazy_Nm5O2A, lazy: true, middleware: false, method: "get" },
+  { route: '/api/orders/track/:id', handler: _lazy_qcCVQj, lazy: true, middleware: false, method: "get" },
   { route: '/__nuxt_error', handler: _lazy_NmmIOD, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: handler$1, lazy: false, middleware: false, method: undefined },
   { route: '/**', handler: _lazy_NmmIOD, lazy: true, middleware: false, method: undefined }
@@ -3152,6 +3189,120 @@ const styles$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   default: styles
 }, Symbol.toStringTag, { value: 'Module' }));
 
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    index: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: ["buyer", "driver", "admin"],
+    default: "buyer"
+  },
+  // Driver Specific Metrics (Defaults to inactive for buyers)
+  isAvailable: {
+    type: Boolean,
+    default: false
+  },
+  // Fully Validated GeoJSON Block
+  currentLocation: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      // Enforces strict GeoJSON compliance
+      default: "Point",
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      default: [-114.2846, 48.2231],
+      // Default regional fallback coordinates (longitude first!)
+      required: true
+    }
+  }
+}, {
+  timestamps: true
+});
+userSchema.index({ "currentLocation.coordinates": "2dsphere" });
+const UserImport = mongoose.models.User || mongoose.model("User", userSchema);
+
+const User$6 = UserImport;
+const login_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { email, password } = body;
+  if (!email || !password) {
+    throw createError({ statusCode: 400, message: "Credentials missing." });
+  }
+  try {
+    const user = await User$6.findOne({ email });
+    if (!user) {
+      throw createError({ statusCode: 401, message: "Invalid authentication credentials." });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw createError({ statusCode: 401, message: "Invalid authentication credentials." });
+    }
+    const sessionPayload = {
+      _id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+    await createSession(event, sessionPayload);
+    return {
+      success: true,
+      message: "Authentication validated.",
+      user: sessionPayload
+    };
+  } catch (error) {
+    console.error("Login authorization aborted:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Internal processing pipeline fault."
+    });
+  }
+});
+
+const login_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: login_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const logout_post = defineEventHandler((event) => {
+  deleteCookie(event, "autodash_session");
+  return { success: true, message: "Session vector destroyed." };
+});
+
+const logout_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: logout_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const me_get = defineEventHandler((event) => {
+  return {
+    user: event.context.user || null
+  };
+});
+
+const me_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: me_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
 const mockLogin_get = defineEventHandler(async (event) => {
   const mockTestUser = {
     _id: "66037a5f945b9b2ca73a933a",
@@ -3171,6 +3322,67 @@ const mockLogin_get = defineEventHandler(async (event) => {
 const mockLogin_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: mockLogin_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const { MONGODB_URI } = process.env;
+const connectDB = async () => {
+  try {
+    const { connection } = await mongoose.connect(MONGODB_URI);
+    if (connection.readyState === 1) {
+      return Promise.resolve(true);
+    }
+  } catch (error) {
+    console.error(error);
+    return Promise.reject(error);
+  }
+};
+
+const User$5 = UserImport;
+const signup_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { name, email, password, role } = body;
+  if (!name || !email || !password || !role) {
+    throw createError({ statusCode: 400, message: "All registration parameters are required." });
+  }
+  try {
+    await connectDB();
+    const existingUser = await User$5.findOne({ email });
+    if (existingUser) {
+      throw createError({ statusCode: 409, message: "An account with this email already exists." });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const newUser = await User$5.create({
+      name,
+      email,
+      password: hashedPassword,
+      role
+      // 'buyer' or 'driver'
+    });
+    const sessionPayload = {
+      _id: newUser._id.toString(),
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role
+    };
+    await createSession(event, sessionPayload);
+    return {
+      success: true,
+      message: "Account provisioned successfully.",
+      user: sessionPayload
+    };
+  } catch (error) {
+    console.error("Signup engine halted:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Internal database write failure."
+    });
+  }
+});
+
+const signup_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: signup_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const partsOrderSchema = new Schema({
@@ -3261,7 +3473,605 @@ const partsOrderSchema = new Schema({
 partsOrderSchema.index({ "deliveryLocation.geoPoint": "2dsphere" });
 const PartsOrderImport = mongoose.models.PartsOrder || mongoose.model("PartsOrder", partsOrderSchema);
 
-const PartsOrder = PartsOrderImport;
+const PartsOrder$a = PartsOrderImport;
+const User$4 = UserImport;
+const index_get$4 = defineEventHandler(async (event) => {
+  var _a;
+  const user = event.context.user;
+  const orderId = getRouterParam(event, "id");
+  if (!(user == null ? void 0 : user._id)) {
+    throw createError({ statusCode: 401, message: "Authentication missing." });
+  }
+  try {
+    const order = await PartsOrder$a.findById(orderId).lean();
+    if (!order) {
+      throw createError({ statusCode: 404, message: "Order manifest not found." });
+    }
+    if (order.buyerId.toString() !== user._id && user.role !== "admin") {
+      throw createError({ statusCode: 403, message: "Unauthorized tracking vector match." });
+    }
+    let driverCoordinates = null;
+    let driverName = "Searching for nearest driver...";
+    if (order.driverId) {
+      const assignedDriver = await User$4.findById(order.driverId).select("name currentLocation").lean();
+      if (assignedDriver) {
+        driverName = assignedDriver.name;
+        if ((_a = assignedDriver.currentLocation) == null ? void 0 : _a.coordinates) {
+          driverCoordinates = assignedDriver.currentLocation.coordinates;
+        }
+      }
+    }
+    return {
+      success: true,
+      status: order.status,
+      supplierName: order.supplier.storeName,
+      deliveryAddress: order.deliveryLocation.address,
+      manifestSummary: order.manifestText,
+      driverProfile: {
+        name: driverName,
+        coordinates: driverCoordinates
+        // Sends [longitude, latitude] to frontend map renders
+      }
+    };
+  } catch (error) {
+    console.error("Buyer tracking query faulted:", error);
+    throw createError({ statusCode: 500, message: "Failed to synchronize tracking feed." });
+  }
+});
+
+const index_get$5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: index_get$4
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$9 = PartsOrderImport;
+const availableOrders_get = defineEventHandler(async (event) => {
+  const user = event.context.user;
+  if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
+    throw createError({
+      statusCode: 403,
+      message: "Access denied. Authorized fleet couriers only."
+    });
+  }
+  try {
+    const openOrders = await PartsOrder$9.find({ status: "placed" }).sort({ createdAt: -1 }).populate("buyerId", "name").lean();
+    return {
+      success: true,
+      orders: openOrders
+    };
+  } catch (error) {
+    console.error("Failed to stream active dispatch vector:", error);
+    throw createError({
+      statusCode: 500,
+      message: "Error fetching open market order catalog."
+    });
+  }
+});
+
+const availableOrders_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: availableOrders_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$8 = PartsOrderImport;
+const fetchJobs_get = defineEventHandler(async (event) => {
+  try {
+    const activeOffers = await PartsOrder$8.find({
+      status: "placed",
+      driverId: null
+    }).sort({ createdAt: -1 }).lean();
+    console.log(`\u{1F4E1} [Radar Engine] Live database query found ${activeOffers.length} unassigned orders.`);
+    const formattedOrders = activeOffers.map((order) => {
+      var _a, _b;
+      const deliveryFee = ((_a = order.pricing) == null ? void 0 : _a.deliveryFee) || 14.5;
+      const BASE_FEE = 7;
+      const PER_MILE_RATE = 1.5;
+      const calculatedDistance = (deliveryFee - BASE_FEE) / PER_MILE_RATE;
+      const rawStoreName = (((_b = order.supplier) == null ? void 0 : _b.storeName) || "").toLowerCase();
+      let readableStoreName = "AutoZone Auto Parts";
+      if (rawStoreName.includes("oreilly") || rawStoreName.includes("o'reilly")) {
+        readableStoreName = "O'Reilly Auto Parts";
+      } else if (rawStoreName.includes("napa")) {
+        readableStoreName = "NAPA Auto Parts";
+      }
+      const locationBlock = order.deliveryLocation || {};
+      const destinationTitle = locationBlock.bayInstructions || "Commercial Fleet Workshop";
+      return {
+        _id: order._id.toString(),
+        // Coerces ObjectId to flat string for clean Vue tracking keys
+        nearestSupplier: readableStoreName,
+        destination: {
+          name: destinationTitle,
+          // 🔥 Explicitly matches your dashboard layout card loop!
+          address: locationBlock.address || "Address Not Specified"
+        },
+        distanceMiles: calculatedDistance > 0 ? Math.round(calculatedDistance * 10) / 10 : 3.2,
+        pricing: deliveryFee,
+        status: order.status
+      };
+    });
+    return {
+      success: true,
+      orders: formattedOrders
+    };
+  } catch (error) {
+    console.error("\u274C Driver job board sync broken:", error);
+    return {
+      success: false,
+      orders: [],
+      message: error.message || "Internal pipeline validation fault."
+    };
+  }
+});
+
+const fetchJobs_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: fetchJobs_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const User$3 = UserImport;
+const toggleAvailability_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { isAvailable } = body;
+  const user = event.context.user;
+  let targetDriverId = user == null ? void 0 : user._id;
+  if (!targetDriverId) {
+    targetDriverId = new mongoose.Types.ObjectId("6a1f377861d1ee56fc110dab");
+  }
+  if (isAvailable === void 0) {
+    throw createError({
+      statusCode: 400,
+      message: "Missing isAvailable availability boolean property."
+    });
+  }
+  try {
+    await connectDB();
+    const updatedUser = await User$3.findByIdAndUpdate(
+      targetDriverId,
+      { $set: { isAvailable: !!isAvailable } },
+      {
+        // 🔥 FIX 1: Silences the Mongoose warning by utilizing the updated spec option
+        returnDocument: "after",
+        runValidators: true
+      }
+    );
+    if (!updatedUser) {
+      throw createError({
+        statusCode: 404,
+        message: "No matching registered courier user document found."
+      });
+    }
+    console.log(`\u{1F4E1} [Availability Engine] Updated database for ${updatedUser.name}: isAvailable is now ${updatedUser.isAvailable}`);
+    return {
+      success: true,
+      currentState: updatedUser.isAvailable
+    };
+  } catch (error) {
+    console.error("\u274C Failed to change driver database visibility status:", error);
+    throw createError({
+      statusCode: 500,
+      message: error.message || "Database state modification faulted."
+    });
+  }
+});
+
+const toggleAvailability_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: toggleAvailability_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const User$2 = UserImport;
+const updateLocation_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const user = event.context.user;
+  if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
+    throw createError({
+      statusCode: 403,
+      message: "Access denied. Location telemetry updates reserved for fleet couriers."
+    });
+  }
+  const { longitude, latitude } = body;
+  if (longitude === void 0 || latitude === void 0) {
+    throw createError({
+      statusCode: 400,
+      message: "Missing explicit hardware spatial coordinates."
+    });
+  }
+  try {
+    await User$2.findByIdAndUpdate(user._id, {
+      $set: {
+        isAvailable: true,
+        // Mark them active in the matching pool
+        currentLocation: {
+          type: "Point",
+          coordinates: [Number(longitude), Number(latitude)]
+          // MongoDB standard: [lng, lat]
+        }
+      }
+    });
+    return {
+      success: true,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    };
+  } catch (error) {
+    console.error("Failed to log hardware location telemetry payload:", error);
+    throw createError({
+      statusCode: 500,
+      message: "Telemetry pipeline save failure."
+    });
+  }
+});
+
+const updateLocation_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: updateLocation_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$7 = PartsOrderImport;
+const index_get$2 = defineEventHandler(async (event) => {
+  const user = event.context.user;
+  if (!(user == null ? void 0 : user._id)) {
+    throw createError({
+      statusCode: 401,
+      message: "Authentication signature missing."
+    });
+  }
+  const orderId = getRouterParam(event, "id");
+  try {
+    const order = await PartsOrder$7.findById(orderId).lean();
+    if (!order) {
+      throw createError({
+        statusCode: 404,
+        message: "Logistics order profile not found in active indexes."
+      });
+    }
+    const isBuyer = order.buyerId.toString() === user._id;
+    const isAssignedDriver = order.driverId && order.driverId.toString() === user._id;
+    const isAdmin = user.role === "admin";
+    if (!isBuyer && !isAssignedDriver && !isAdmin) {
+      throw createError({
+        statusCode: 403,
+        message: "Access denied. You are not authorized to track this delivery manifest route."
+      });
+    }
+    return {
+      success: true,
+      order
+    };
+  } catch (error) {
+    console.error("Failed to resolve order data extraction:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Database lookup pipeline exception."
+    });
+  }
+});
+
+const index_get$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: index_get$2
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$6 = PartsOrderImport;
+const status_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const user = event.context.user;
+  const orderId = getRouterParam(event, "id");
+  if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
+    throw createError({
+      statusCode: 403,
+      message: "Access denied. Only the assigned courier can mutate transit parameters."
+    });
+  }
+  const { status: nextStatus } = body;
+  const validStatuses = ["picking-up", "in-transit", "delivered", "cancelled"];
+  if (!nextStatus || !validStatuses.includes(nextStatus)) {
+    throw createError({
+      statusCode: 400,
+      message: "Invalid or missing target lifecycle state modification directive."
+    });
+  }
+  try {
+    const order = await PartsOrder$6.findById(orderId);
+    if (!order) {
+      throw createError({ statusCode: 404, message: "Target order context record missing." });
+    }
+    if (order.driverId.toString() !== user._id) {
+      throw createError({
+        statusCode: 403,
+        message: "Security breach attempt. This tracking route vector belongs to another fleet courier."
+      });
+    }
+    order.status = nextStatus;
+    if (nextStatus === "picking-up" && !order.pickedUpAt) {
+      order.pickedUpAt = /* @__PURE__ */ new Date();
+    } else if (nextStatus === "delivered" && !order.deliveredAt) {
+      order.deliveredAt = /* @__PURE__ */ new Date();
+    }
+    await order.save();
+    return {
+      success: true,
+      message: `Logistics pipeline successfully advanced to state: ${nextStatus}`,
+      currentStatus: order.status
+    };
+  } catch (error) {
+    console.error("Lifecycle status advance transaction state failure:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Data mutations aborted during transaction phase."
+    });
+  }
+});
+
+const status_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: status_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$5 = PartsOrderImport;
+const acceptJob_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { orderId } = body;
+  const user = event.context.user;
+  const driverId = (user == null ? void 0 : user._id) || new mongoose.Types.ObjectId("6a1f377861d1ee56fc110dab");
+  if (!orderId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Missing target validation payload. orderId required."
+    });
+  }
+  try {
+    await connectDB();
+    const finalizedOrder = await PartsOrder$5.findOneAndUpdate(
+      {
+        _id: new mongoose.Types.ObjectId(orderId),
+        status: "placed",
+        driverId: null
+      },
+      {
+        $set: {
+          driverId,
+          status: "accepted",
+          updatedAt: /* @__PURE__ */ new Date()
+        }
+      },
+      {
+        returnDocument: "after"
+        // Uses modern non-deprecated spec option
+      }
+    );
+    if (!finalizedOrder) {
+      throw createError({
+        statusCode: 409,
+        // Conflict state
+        statusMessage: "This hot-shot dispatch offer has already been claimed by another driver."
+      });
+    }
+    console.log(`\u{1F4E6} [Logistics Core] Order ${orderId} successfully locked by driver ${driverId}`);
+    return {
+      success: true,
+      message: "Hot-shot dispatch route secured. Proceeding to supplier counter.",
+      order: finalizedOrder
+    };
+  } catch (error) {
+    console.error("\u274C Failed to assign driver dispatch contract:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Internal logistics distribution fault."
+    });
+  }
+});
+
+const acceptJob_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: acceptJob_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$4 = PartsOrderImport;
+const accept_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const user = event.context.user;
+  if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
+    throw createError({
+      statusCode: 403,
+      message: "Access denied. Only registered fleet couriers can claim open market routes."
+    });
+  }
+  const { orderId } = body;
+  if (!orderId) {
+    throw createError({
+      statusCode: 400,
+      message: "Missing unique target order identification hash parameter."
+    });
+  }
+  try {
+    const securedOrder = await PartsOrder$4.findOneAndUpdate(
+      {
+        _id: orderId,
+        status: "placed"
+      },
+      {
+        $set: {
+          driverId: user._id,
+          status: "accepted",
+          acceptedAt: /* @__PURE__ */ new Date()
+        }
+      },
+      {
+        new: true,
+        // Returns the freshly updated document configuration properties
+        runValidators: true
+      }
+    );
+    if (!securedOrder) {
+      throw createError({
+        statusCode: 409,
+        // Conflict state code match identifier
+        message: "Route ticket collision. This delivery run was already claimed by another active driver."
+      });
+    }
+    return {
+      success: true,
+      message: "Route vector locked down successfully. Dispatching supplier manifest access details.",
+      order: {
+        id: securedOrder._id,
+        status: securedOrder.status,
+        commercialOrderNumber: securedOrder.supplier.commercialOrderNumber,
+        storeAddress: securedOrder.supplier.storeAddress,
+        deliveryAddress: securedOrder.deliveryLocation.address
+      }
+    };
+  } catch (error) {
+    console.error("Driver dispatch ticket lock acquisition failure:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Internal pipeline validation error during route claim negotiation."
+    });
+  }
+});
+
+const accept_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: accept_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const MONTA_AUTOMOTIVE_HUBS = [
+  {
+    name: "O'Reilly Auto Parts - Columbia Falls",
+    coordinates: [-114.1974, 48.3644]
+  },
+  {
+    name: "AutoZone Auto Parts - Kalispell",
+    coordinates: [-114.3292, 48.1965]
+  },
+  {
+    name: "NAPA Auto Parts - Whitefish",
+    coordinates: [-114.3324, 48.4022]
+  }
+];
+function calculateDistanceInMiles(coords1, coords2) {
+  const toRad = (value) => value * Math.PI / 180;
+  const R = 3956;
+  const dLat = toRad(coords2[1] - coords1[1]);
+  const dLon = toRad(coords2[0] - coords1[0]);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(coords1[1])) * Math.cos(toRad(coords2[1])) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+const autoDispatchQuote_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { destinationCoords } = body;
+  if (!destinationCoords || !Array.isArray(destinationCoords) || destinationCoords.length !== 2) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Malforming routing matrix payload. Destination coordinates required."
+    });
+  }
+  let closestHub = MONTA_AUTOMOTIVE_HUBS[0];
+  let shortestDistance = Infinity;
+  for (const hub of MONTA_AUTOMOTIVE_HUBS) {
+    const distance = calculateDistanceInMiles(hub.coordinates, destinationCoords);
+    if (distance < shortestDistance) {
+      shortestDistance = distance;
+      closestHub = hub;
+    }
+  }
+  const BASE_FEE = 7;
+  const PER_MILE_RATE = 1.5;
+  const rawCost = BASE_FEE + shortestDistance * PER_MILE_RATE;
+  const finalDeliveryRate = Math.max(BASE_FEE, Math.round(rawCost * 100) / 100);
+  return {
+    success: true,
+    nearestSupplier: closestHub == null ? void 0 : closestHub.name,
+    distanceMiles: Math.round(shortestDistance * 10) / 10,
+    estimatedRate: finalDeliveryRate
+  };
+});
+
+const autoDispatchQuote_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: autoDispatchQuote_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const calculateRate_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { supplierCoords, destinationCoords } = body;
+  if (!supplierCoords || !destinationCoords) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid coordinate payloads provided."
+    });
+  }
+  const toRad = (value) => value * Math.PI / 180;
+  const R = 3956;
+  const dLat = toRad(destinationCoords[1] - supplierCoords[1]);
+  const dLon = toRad(destinationCoords[0] - supplierCoords[0]);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(supplierCoords[1])) * Math.cos(toRad(destinationCoords[1])) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distanceInMiles = R * c;
+  const BASE_FEE = 7;
+  const PER_MILE_RATE = 1.5;
+  const calculatedRate = BASE_FEE + distanceInMiles * PER_MILE_RATE;
+  const finalDeliveryRate = Math.max(BASE_FEE, Math.round(calculatedRate * 100) / 100);
+  return {
+    success: true,
+    distanceMiles: Math.round(distanceInMiles * 10) / 10,
+    estimatedRate: finalDeliveryRate
+  };
+});
+
+const calculateRate_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: calculateRate_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$3 = PartsOrderImport;
+const completeJob_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { orderId } = body;
+  if (!orderId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Order ID parameter missing from closure payload."
+    });
+  }
+  try {
+    const completedOrder = await PartsOrder$3.findByIdAndUpdate(
+      new mongoose.Types.ObjectId(orderId),
+      {
+        $set: {
+          status: "completed",
+          updatedAt: /* @__PURE__ */ new Date()
+        }
+      },
+      { returnDocument: "after" }
+    );
+    console.log(`\u{1F3C1} [Logistics Core] Order ${orderId} marked completed. Cargo dropped off.`);
+    return {
+      success: true,
+      message: "Delivery manifest marked finalized. Earnings routed to driver wallet balance.",
+      order: completedOrder
+    };
+  } catch (error) {
+    console.error("\u274C Failed to finalize order completion lifecycle:", error);
+    throw createError({
+      statusCode: 500,
+      message: error.message || "Database state modification faulted."
+    });
+  }
+});
+
+const completeJob_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: completeJob_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$2 = PartsOrderImport;
+const HUB_COORDINATE_MAP = {
+  "O'Reilly": [-114.1974, 48.3644],
+  "AutoZone": [-114.3292, 48.1965],
+  "NAPA": [-114.3324, 48.4022]
+};
 const create_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const user = event.context.user;
@@ -3271,58 +4081,69 @@ const create_post = defineEventHandler(async (event) => {
       message: "Authentication trace missing. Please log in to request couriers."
     });
   }
-  const {
-    year,
-    make,
-    model,
-    storeName,
-    storeAddress,
-    commercialOrderNumber,
-    manifestText,
-    deliveryAddress,
-    bayInstructions,
-    lng,
-    lat
-  } = body;
-  if (!year || !make || !model || !storeAddress || !commercialOrderNumber || !manifestText || !deliveryAddress) {
+  const { vehicle, parts, destination, pricing } = body;
+  if (!vehicle || !vehicle.year || !vehicle.make || !vehicle.model) {
     throw createError({
       statusCode: 400,
-      message: "All core logistical fields must be completed to initialize dispatch vectors."
+      message: "Target vehicle specifications are missing or incomplete."
+    });
+  }
+  if (!parts || !parts.trim()) {
+    throw createError({
+      statusCode: 400,
+      message: "Parts line items or manifest text cannot be empty."
+    });
+  }
+  if (!destination || !destination.name || !destination.address || !destination.coordinates) {
+    throw createError({
+      statusCode: 400,
+      message: "Destination workshop destination vectors are missing."
     });
   }
   try {
-    const baseDeliveryFee = 14.5;
-    const driverCutPercentage = 0.85;
-    const driverPayout = Number((baseDeliveryFee * driverCutPercentage).toFixed(2));
-    const platformCut = Number((baseDeliveryFee - driverPayout).toFixed(2));
-    const targetLongitude = lng ? Number(lng) : -114.2846;
-    const targetLatitude = lat ? Number(lat) : 48.2231;
-    const newOrder = await PartsOrder.create({
+    await connectDB();
+    let schemaStoreEnum = "AutoZone";
+    let fullDisplayAddress = "740 US Hwy 2 W, Kalispell, MT";
+    if (destination.name.includes("Whitefish")) {
+      schemaStoreEnum = "NAPA";
+      fullDisplayAddress = "6435 US-93, Whitefish, MT";
+    } else if (destination.name.includes("Glacier") || destination.name.includes("Columbia Falls")) {
+      schemaStoreEnum = "O'Reilly";
+      fullDisplayAddress = "1405 9th St W, Columbia Falls, MT";
+    }
+    const supplierCoords = HUB_COORDINATE_MAP[schemaStoreEnum];
+    const finalDeliveryFee = pricing ? Number(pricing) : 14.5;
+    const DRIVER_CUT_RATIO = 0.85;
+    const driverPayout = Number((finalDeliveryFee * DRIVER_CUT_RATIO).toFixed(2));
+    const platformCut = Number((finalDeliveryFee - driverPayout).toFixed(2));
+    const newOrder = await PartsOrder$2.create({
       buyerId: user._id,
-      // Tracks the authenticated buyer
       driverId: null,
       vehicle: {
-        year: Number(year),
-        make,
-        model
+        year: Number(vehicle.year),
+        make: vehicle.make,
+        model: vehicle.model
       },
       supplier: {
-        storeName,
-        storeAddress,
-        commercialOrderNumber: commercialOrderNumber.toUpperCase().trim()
+        storeName: schemaStoreEnum,
+        // 🔥 UPDATED: Shifted to capitalized string format to satisfy schema enum constraints
+        storeAddress: fullDisplayAddress,
+        commercialOrderNumber: `AUTO-${Math.floor(1e5 + Math.random() * 9e5)}`
       },
-      manifestText,
+      manifestText: parts,
       deliveryLocation: {
-        address: deliveryAddress,
-        bayInstructions: bayInstructions || "",
+        address: destination.address,
+        bayInstructions: destination.name,
         geoPoint: {
           type: "Point",
-          coordinates: [targetLongitude, targetLatitude]
+          coordinates: [Number(destination.coordinates[0]), Number(destination.coordinates[1])]
+          // [longitude, latitude]
         }
       },
       status: "placed",
+      // Retained original schema validation status keyword
       pricing: {
-        deliveryFee: baseDeliveryFee,
+        deliveryFee: finalDeliveryFee,
         driverPayout,
         platformCut
       }
@@ -3345,6 +4166,103 @@ const create_post = defineEventHandler(async (event) => {
 const create_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: create_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$1 = PartsOrderImport;
+const User$1 = UserImport;
+const track__id__get = defineEventHandler(async (event) => {
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+  const orderId = getRouterParam(event, "id");
+  try {
+    await connectDB();
+    const order = await PartsOrder$1.findById(orderId).lean();
+    if (!order) {
+      throw createError({ statusCode: 404, message: "Order tracking manifest not found." });
+    }
+    const supplierCoords = ((_a = order.supplier) == null ? void 0 : _a.storeName) === "NAPA" ? [-114.3324, 48.4022] : ((_b = order.supplier) == null ? void 0 : _b.storeName) === "O'Reilly" ? [-114.1974, 48.3644] : [-114.3292, 48.1965];
+    let driverCoords = null;
+    if (order.driverId) {
+      const driver = await User$1.findById(order.driverId).select("currentLocation name").lean();
+      if ((_c = driver == null ? void 0 : driver.currentLocation) == null ? void 0 : _c.coordinates) {
+        driverCoords = [driver.currentLocation.coordinates[1], driver.currentLocation.coordinates[0]];
+      }
+    }
+    return {
+      success: true,
+      status: order.status,
+      manifest: {
+        supplierName: ((_d = order.supplier) == null ? void 0 : _d.storeName) || "Auto Parts Vendor",
+        supplierCoords: [supplierCoords[1], supplierCoords[0]],
+        // [lat, lng]
+        destinationName: ((_e = order.deliveryLocation) == null ? void 0 : _e.bayInstructions) || "Workshop Target",
+        destinationCoords: [(_g = (_f = order.deliveryLocation) == null ? void 0 : _f.geoPoint) == null ? void 0 : _g.coordinates[1], (_i = (_h = order.deliveryLocation) == null ? void 0 : _h.geoPoint) == null ? void 0 : _i.coordinates[0]],
+        // [lat, lng]
+        parts: order.manifestText || "Commercial Parts Payload"
+      },
+      driver: driverCoords ? {
+        name: order.driverName || "Fleet Courier",
+        coords: driverCoords
+      } : null
+    };
+  } catch (error) {
+    console.error("Tracking coordinate sync aborted:", error);
+    throw createError({ statusCode: 500, message: error.message });
+  }
+});
+
+const track__id__get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: track__id__get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder = PartsOrderImport;
+const User = UserImport;
+const index_get = defineEventHandler(async (event) => {
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+  const orderId = getRouterParam(event, "id");
+  try {
+    await connectDB();
+    const order = await PartsOrder.findById(orderId).lean();
+    if (!order) {
+      throw createError({ statusCode: 404, message: "Order tracking manifest not found." });
+    }
+    const supplierCoords = ((_a = order.supplier) == null ? void 0 : _a.storeName) === "NAPA" ? [-114.3324, 48.4022] : ((_b = order.supplier) == null ? void 0 : _b.storeName) === "O'Reilly" ? [-114.1974, 48.3644] : [-114.3292, 48.1965];
+    let driverCoords = null;
+    if (order.driverId) {
+      const driver = await User.findById(order.driverId).select("currentLocation name").lean();
+      if ((_c = driver == null ? void 0 : driver.currentLocation) == null ? void 0 : _c.coordinates) {
+        driverCoords = [driver.currentLocation.coordinates[1], driver.currentLocation.coordinates[0]];
+      }
+    }
+    return {
+      success: true,
+      status: order.status,
+      manifest: {
+        supplierName: ((_d = order.supplier) == null ? void 0 : _d.storeName) || "Auto Parts Vendor",
+        supplierCoords: [supplierCoords[1], supplierCoords[0]],
+        // [lat, lng]
+        destinationName: ((_e = order.deliveryLocation) == null ? void 0 : _e.bayInstructions) || "Workshop Target",
+        destinationCoords: [(_g = (_f = order.deliveryLocation) == null ? void 0 : _f.geoPoint) == null ? void 0 : _g.coordinates[1], (_i = (_h = order.deliveryLocation) == null ? void 0 : _h.geoPoint) == null ? void 0 : _i.coordinates[0]],
+        // [lat, lng]
+        parts: order.manifestText || "Commercial Parts Payload"
+      },
+      driver: driverCoords ? {
+        name: order.driverName || "Michael Dreesen",
+        coords: driverCoords
+      } : null
+    };
+  } catch (error) {
+    console.error("\u274C Tracking coordinate sync aborted:", error);
+    throw createError({
+      statusCode: 500,
+      message: error.message || "Failed to extract tracking parameters."
+    });
+  }
+});
+
+const index_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: index_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function renderPayloadResponse(ssrContext) {

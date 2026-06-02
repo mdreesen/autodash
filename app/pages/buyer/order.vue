@@ -1,161 +1,158 @@
-<script setup lang="ts">
-const isLoading = ref(false)
+<script setup>
+import { ref, watch } from 'vue'
 
-// Form State Container
-const orderForm = ref({
-  year: '',
-  make: '',
-  model: '',
-  storeName: 'O\'Reilly Auto Parts',
-  storeAddress: '',
-  commercialOrderNumber: '',
-  manifestText: '',
-  deliveryAddress: '',
-  bayInstructions: ''
-})
-
-const storeOptions = [
-  { label: 'O\'Reilly Auto Parts', value: 'O\'Reilly Auto Parts' },
-  { label: 'NAPA Auto Parts', value: 'NAPA Auto Parts' },
-  { label: 'AutoZone', value: 'AutoZone' },
-  { label: 'Advance Auto Parts', value: 'Advance Auto Parts' },
-  { label: 'Factory Direct / Independent Distributor', value: 'Independent' }
+// Target Workshop locations owned or utilized by buyers
+const buyerWorkshops = [
+  {
+    name: "Big Mountain Repair (Evergreen)",
+    address: "Evergreen Region, Kalispell, MT",
+    coordinates: [-114.2846, 48.2231]
+  },
+  {
+    name: "Whitefish Automotive Care",
+    address: "W 2nd St, Whitefish, MT 59937",
+    coordinates: [-114.3411, 48.4114]
+  },
+  {
+    name: "Glacier Field Service Garage",
+    address: "Nucleus Ave, Columbia Falls, MT 59912",
+    coordinates: [-114.1832, 48.3712]
+  }
 ]
 
-const submitOrderRequest = async () => {
-  if (!orderForm.value.commercialOrderNumber || !orderForm.value.deliveryAddress) {
-    alert('Please fill out the pre-paid Commercial Order Number and Delivery Address.')
-    return
-  }
-  
-  isLoading.value = true
+// --- REACTIVE STATE STORAGE BINDINGS ---
+const year = ref('2022')
+const make = ref('Ford')
+const modelName = ref('F-150')
+const partsRequested = ref('') // Text area for line item parts requests
+
+const selectedDestination = ref(buyerWorkshops[0])
+
+// Dynamic Valuation Vectors (Now calculated via backend proximity dispatch lookup)
+const estimatedRate = ref(0.00)
+const calculatedDistance = ref(0)
+const nearestSupplierFound = ref('')
+const isCalculating = ref(false)
+
+// --- DOOR-DASH STYLE AUTO DISPATCH HANDSHAKE ---
+async function fetchAutoDispatchMetrics() {
+  isCalculating.value = true
   try {
-    // This will hit your future Nitro order creation pipeline endpoint
-    const response = await $fetch('/api/orders/create', {
+    // The backend now takes the buyer's destination and automatically calculates
+    // the distance to the closest optimized commercial parts provider.
+    const response = await $fetch('/api/orders/auto-dispatch-quote', {
       method: 'POST',
-      body: orderForm.value
+      body: {
+        destinationCoords: selectedDestination.value.coordinates
+      }
     })
     
-    alert('Parts delivery request broadcasted successfully to nearby drivers!')
-    
-    // Clear out form fields on success
-    orderForm.value.commercialOrderNumber = ''
-    orderForm.value.manifestText = ''
-  } catch (error) {
-    console.error('Failed to dispatch order:', error)
+    if (response.success) {
+      estimatedRate.value = response.estimatedRate
+      calculatedDistance.value = response.distanceMiles
+      nearestSupplierFound.value = response.nearestSupplier
+    }
+  } catch (err) {
+    console.error('Failed to resolve dynamic delivery cost vectors:', err)
   } finally {
-    isLoading.value = false
+    isCalculating.value = false
+  }
+}
+
+// Automatically recalculate route metrics whenever the buyer changes their delivery destination
+watch(selectedDestination, () => {
+  fetchAutoDispatchMetrics()
+}, { immediate: true })
+
+async function handleConfirmOrder() {
+  try {
+    const orderPayload = {
+      vehicle: { year: year.value, make: make.value, model: modelName.value },
+      parts: partsRequested.value,
+      destination: selectedDestination.value,
+      pricing: estimatedRate.value
+    }
+    
+    // Dispatches payload cleanly to your newly fixed backend server file
+    const data = await $fetch('/api/orders/create', {
+      method: 'POST',
+      body: orderPayload
+    })
+    
+    // 🔥 FIX: Redirect directly to your real tracking screen structure!
+    if (data.success && data.orderId) {
+      useRouter().push(`/buyer/track-order/${data.orderId}`)
+    }
+  } catch (error) {
+    console.error('Order creation failed:', error)
   }
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#020203] text-white pb-12 font-sans selection:bg-[#30cf43] selection:text-black">
-    <div class="sticky top-0 z-50 bg-[#020203]/80 backdrop-blur-md border-b border-white/5 px-4 py-4 flex items-center justify-between">
-      <div>
-        <h1 class="text-lg font-black tracking-tight flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-[#30cf43] animate-pulse"></span>
-          AutoDash Courier
-        </h1>
-        <p class="text-[10px] text-zinc-500 font-mono tracking-wide uppercase">On-Demand Commercial Parts Delivery</p>
-      </div>
-      <div class="bg-zinc-900 border border-white/10 px-2.5 py-1 rounded-full text-[10px] font-mono text-[#30cf43]">
-        MVP Protocol v1.0
-      </div>
-    </div>
-
-    <div class="max-w-md mx-auto px-4 mt-6 space-y-6">
-      <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-4">
-        <div class="flex items-center gap-2 border-b border-white/5 pb-2">
-          <div class="text-[#30cf43] text-xs font-mono font-black">01 //</div>
-          <h2 class="text-xs font-black uppercase tracking-wider text-zinc-400">Vehicle Target Specifications</h2>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Year</label>
-            <input v-model="orderForm.year" type="number" placeholder="2018" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600" />
-          </div>
-          <div class="col-span-2">
-            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Make</label>
-            <input v-model="orderForm.make" type="text" placeholder="Ford (e.g.)" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Model Name / Sub-Trim</label>
-          <input v-model="orderForm.model" type="text" placeholder="F-150 Raptor Ecoboost" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600" />
-        </div>
-      </div>
-
-      <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-4">
-        <div class="flex items-center gap-2 border-b border-white/5 pb-2">
-          <div class="text-[#30cf43] text-xs font-mono font-black">02 //</div>
-          <h2 class="text-xs font-black uppercase tracking-wider text-zinc-400">Parts Store Pickup Coordinates</h2>
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Auto Supply Partner</label>
-          <select v-model="orderForm.storeName" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#30cf43] text-white">
-            <option v-for="option in storeOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Parts Store Specific Address</label>
-          <input v-model="orderForm.storeAddress" type="text" placeholder="2400 US-2, Kalispell, MT" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600" />
-        </div>
-
-        <div class="p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-xl space-y-2">
-          <label class="block text-[11px] font-black text-yellow-400 uppercase tracking-wider">
-            Commercial Account Order Verification #
-          </label>
-          <input v-model="orderForm.commercialOrderNumber" type="text" placeholder="Ex: NAPA-849202" class="w-full bg-zinc-950 border border-yellow-500/30 rounded-xl px-3 py-2.5 text-sm font-mono text-yellow-400 placeholder:text-zinc-700 focus:outline-none focus:border-yellow-400 uppercase" />
-          <p class="text-[10px] text-zinc-500 leading-tight">The driver will display this alphanumeric signature string to the parts counter associate to claim the pre-paid parcel box.</p>
-        </div>
-      </div>
-
-      <div class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-4">
-        <div class="flex items-center gap-2 border-b border-white/5 pb-2">
-          <div class="text-[#30cf43] text-xs font-mono font-black">03 //</div>
-          <h2 class="text-xs font-black uppercase tracking-wider text-zinc-400">Manifest Contents & Target Destination</h2>
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Manifest Line-Items (Optional Memo)</label>
-          <textarea v-model="orderForm.manifestText" rows="3" placeholder="2x Front Brake Rotors&#10;1x Ceramic Brake Pad Set" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600 resize-none leading-relaxed" />
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Drop-off Destination Address</label>
-          <input v-model="orderForm.deliveryAddress" type="text" placeholder="Dave's Auto Repair, 120 Main St." class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600" />
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Bay Number / Delivery Instructions</label>
-          <input v-model="orderForm.bayInstructions" type="text" placeholder="Bring straight back around to Lift Bay 3" class="w-full bg-zinc-900 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#30cf43] text-white placeholder:text-zinc-600" />
-        </div>
-      </div>
-
-      <div class="bg-gradient-to-r from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl p-4 flex items-center justify-between shadow-xl">
-        <div>
-          <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Calculated Route Overhead</div>
-          <div class="text-xl font-black text-[#30cf43] font-mono mt-0.5">$14.50</div>
-        </div>
-        <div class="text-right text-[10px] text-zinc-400 max-w-[180px] leading-tight font-medium">
-          Based on auto supplier distance calculations to destination zone coordinates.
-        </div>
-      </div>
-
-      <button :disabled="isLoading" @click="submitOrderRequest" class="w-full bg-[#30cf43] text-black font-black uppercase text-xs tracking-wider py-4 rounded-xl shadow-lg shadow-[#30cf43]/10 hover:bg-[#2cb93c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-        <svg v-if="isLoading" class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        {{ isLoading ? 'Broadcasting Job Vector...' : 'Authorize Express Parts Pickup' }}
+  <div class="min-h-screen bg-white pb-24 text-gray-900 font-sans">
+    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-100 sticky top-0 z-50">
+      <button class="p-2 hover:bg-gray-50 rounded-full transition-colors" @click="$router.back()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-gray-800"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
       </button>
-    </div>
+      <h1 class="text-base font-bold text-gray-900 tracking-tight">Request Hot-Shot Delivery</h1>
+      <div class="w-9 h-9 flex items-center justify-center rounded-full bg-orange-50 text-orange-600 font-bold text-xs">MB</div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6">
+      
+      <section class="border border-gray-100 rounded-2xl p-4 bg-white shadow-xs space-y-4">
+        <div class="flex items-center space-x-2 pb-2 border-b border-gray-50">
+          <span class="text-xs font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md">01</span>
+          <h3 class="text-sm font-bold tracking-tight text-gray-800 uppercase">Target Vehicle</h3>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <input type="text" v-model="year" placeholder="Year" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm" />
+          <input type="text" v-model="make" placeholder="Make" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm col-span-2" />
+        </div>
+        <input type="text" v-model="modelName" placeholder="Model (e.g. F-150)" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm" />
+      </section>
+
+      <section class="border border-gray-100 rounded-2xl p-4 bg-white shadow-xs space-y-4">
+        <div class="flex items-center space-x-2 pb-2 border-b border-gray-50">
+          <span class="text-xs font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md">02</span>
+          <h3 class="text-sm font-bold tracking-tight text-gray-800 uppercase">Parts Needed</h3>
+        </div>
+        <textarea 
+          v-model="partsRequested" 
+          rows="2" 
+          placeholder="List required parts here (e.g., Starter motor, front brake pads...)" 
+          class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none"
+        ></textarea>
+      </section>
+
+      <section class="border border-gray-100 rounded-2xl p-4 bg-white shadow-xs space-y-4">
+        <div class="flex items-center space-x-2 pb-2 border-b border-gray-50">
+          <span class="text-xs font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md">03</span>
+          <h3 class="text-sm font-bold tracking-tight text-gray-800 uppercase">Your Shop Location</h3>
+        </div>
+        <select v-model="selectedDestination" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm font-medium text-gray-800">
+          <option v-for="shop in buyerWorkshops" :key="shop.name" :value="shop">{{ shop.name }}</option>
+        </select>
+      </section>
+
+      <section class="p-4 border border-gray-100 rounded-2xl bg-gray-50/50 space-y-1 relative overflow-hidden">
+        <div v-if="isCalculating" class="absolute inset-0 bg-white/75 flex items-center justify-center rounded-2xl text-xs font-bold text-orange-500">
+          Finding nearest supplier node...
+        </div>
+        <p class="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Estimated Delivery Cost</p>
+        <div class="flex items-baseline space-x-1">
+          <h2 class="text-3xl font-black text-gray-900">${{ estimatedRate.toFixed(2) }}</h2>
+        </div>
+        <p class="text-[11px] text-gray-400 leading-normal" v-if="nearestSupplierFound">
+          Sourced automatically from <strong class="text-gray-600 font-semibold">{{ nearestSupplierFound }}</strong> ({{ calculatedDistance }} miles away).
+        </p>
+      </section>
+
+      <button @click="handleConfirmOrder" class="w-full py-4 bg-orange-500 text-white font-extrabold text-sm rounded-2xl shadow-lg uppercase tracking-wide">
+        Submit Hot-Shot Request
+      </button>
+
+    </main>
   </div>
 </template>

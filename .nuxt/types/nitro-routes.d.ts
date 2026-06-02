@@ -3,11 +3,65 @@ import type { Serialize, Simplify } from "nitropack/types";
 declare module "nitropack/types" {
   type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T
   interface InternalApi {
+    '/api/auth/login': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/login.post').default>>>>
+    }
+    '/api/auth/logout': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/logout.post').default>>>>
+    }
+    '/api/auth/me': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/me.get').default>>>>
+    }
     '/api/auth/mock-login': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/mock-login.get').default>>>>
     }
+    '/api/auth/signup': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/signup.post').default>>>>
+    }
+    '/api/buyer/track-order/:id': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/buyer/track-order/[id]/index.get').default>>>>
+    }
+    '/api/driver/available-orders': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/available-orders.get').default>>>>
+    }
+    '/api/driver/fetch-jobs': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/fetch-jobs.get').default>>>>
+    }
+    '/api/driver/toggle-availability': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/toggle-availability.post').default>>>>
+    }
+    '/api/driver/update-location': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/driver/update-location.post').default>>>>
+    }
+    '/api/orders/:id': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/[id]/index.get').default>>>>
+    }
+    '/api/orders/:id/status': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/[id]/status.post').default>>>>
+    }
+    '/api/orders/accept-job': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/accept-job.post').default>>>>
+    }
+    '/api/orders/accept': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/accept.post').default>>>>
+    }
+    '/api/orders/auto-dispatch-quote': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/auto-dispatch-quote.post').default>>>>
+    }
+    '/api/orders/calculate-rate': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/calculate-rate.post').default>>>>
+    }
+    '/api/orders/complete-job': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/complete-job.post').default>>>>
+    }
     '/api/orders/create': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/create.post').default>>>>
+    }
+    '/api/orders/track-:id': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/track-[id].get').default>>>>
+    }
+    '/api/orders/track/:id': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/track/[id]/index.get').default>>>>
     }
     '/__nuxt_error': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>

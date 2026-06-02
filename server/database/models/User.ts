@@ -1,7 +1,3 @@
-/**
- * AUTODASH SYSTEM USER SCHEMA
- * MONGODB INTERFACE // ROLE-BASED ACCESS CONTROL
- */
 import mongoose, { Schema } from 'mongoose'
 
 const userSchema = new Schema({
@@ -35,15 +31,24 @@ const userSchema = new Schema({
     default: false 
   },
   
+  // Fully Validated GeoJSON Block
   currentLocation: {
-    type: { type: String, default: 'Point' },
-    coordinates: { type: [Number], default: [-114.2846, 48.2231] } // Default region coordinates
+    type: { 
+      type: String, 
+      enum: ['Point'], // Enforces strict GeoJSON compliance
+      default: 'Point',
+      required: true
+    },
+    coordinates: { 
+      type: [Number], 
+      default: [-114.2846, 48.2231], // Default regional fallback coordinates (longitude first!)
+      required: true
+    }
   }
 }, { 
   timestamps: true 
 })
 
-// Enable swift spatial mapping for online drivers
-userSchema.index({ currentLocation: '2dsphere' })
+userSchema.index({ 'currentLocation.coordinates': '2dsphere' })
 
 export default mongoose.models.User || mongoose.model('User', userSchema)

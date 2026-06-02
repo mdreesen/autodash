@@ -1,12 +1,24 @@
+/**
+ * AUTODASH HOT-SHOT DISPATCH ORDER PROVISIONING GATEWAY
+ * SERVER/API/ORDERS/CREATE.POST.TS
+ */
 import type { Model } from 'mongoose'
 import PartsOrderImport from '../../database/models/PartsOrder'
+import { connectDB } from "../../database/mongodb";
 
 const PartsOrder = PartsOrderImport as Model<any>
+
+// Global geo-coordinate coordinates map matching strict schema strings
+const HUB_COORDINATE_MAP: Record<string, [number, number]> = {
+  "O'Reilly": [-114.1974, 48.3644],
+  "AutoZone": [-114.3292, 48.1965],
+  "NAPA": [-114.3324, 48.4022]
+}
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   
-  // FIXED: Pulls the user identity directly from our new local middleware context
+  // Pulls the authenticated user identity directly from local middleware contexts
   const user = event.context.user
 
   // Session Tracing & Security Verification
@@ -17,68 +29,87 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const {
-    year,
-    make,
-    model,
-    storeName,
-    storeAddress,
-    commercialOrderNumber,
-    manifestText,
-    deliveryAddress,
-    bayInstructions,
-    lng,
-    lat
-  } = body
+  // Extract structured parameters matching the new DoorDash-style client payload
+  const { vehicle, parts, destination, pricing } = body
 
-  if (!year || !make || !model || !storeAddress || !commercialOrderNumber || !manifestText || !deliveryAddress) {
+  // Core payload safety validations
+  if (!vehicle || !vehicle.year || !vehicle.make || !vehicle.model) {
     throw createError({
       statusCode: 400,
-      message: 'All core logistical fields must be completed to initialize dispatch vectors.'
+      message: 'Target vehicle specifications are missing or incomplete.'
+    })
+  }
+
+  if (!parts || !parts.trim()) {
+    throw createError({
+      statusCode: 400,
+      message: 'Parts line items or manifest text cannot be empty.'
+    })
+  }
+
+  if (!destination || !destination.name || !destination.address || !destination.coordinates) {
+    throw createError({
+      statusCode: 400,
+      message: 'Destination workshop destination vectors are missing.'
     })
   }
 
   try {
-    const baseDeliveryFee = 14.50
-    const driverCutPercentage = 0.85
+    await connectDB();
+
+    // 1. Map to Capitalized Schema Enum String Variants ('AutoZone' | 'NAPA' | "O'Reilly")
+    let schemaStoreEnum = "AutoZone"
+    let fullDisplayAddress = "740 US Hwy 2 W, Kalispell, MT"
+
+    if (destination.name.includes("Whitefish")) {
+      schemaStoreEnum = "NAPA"
+      fullDisplayAddress = "6435 US-93, Whitefish, MT"
+    } else if (destination.name.includes("Glacier") || destination.name.includes("Columbia Falls")) {
+      schemaStoreEnum = "O'Reilly"
+      fullDisplayAddress = "1405 9th St W, Columbia Falls, MT"
+    }
+
+    const supplierCoords = HUB_COORDINATE_MAP[schemaStoreEnum] as [number, number]
+
+    // 2. Compute financial platform and payout splits dynamically from the passed quote
+    const finalDeliveryFee = pricing ? Number(pricing) : 14.50
+    const DRIVER_CUT_RATIO = 0.85
     
-    const driverPayout = Number((baseDeliveryFee * driverCutPercentage).toFixed(2)) // $12.33
-    const platformCut = Number((baseDeliveryFee - driverPayout).toFixed(2))         // $2.17
+    const driverPayout = Number((finalDeliveryFee * DRIVER_CUT_RATIO).toFixed(2))
+    const platformCut = Number((finalDeliveryFee - driverPayout).toFixed(2))
 
-    const targetLongitude = lng ? Number(lng) : -114.2846 
-    const targetLatitude = lat ? Number(lat) : 48.2231
-
+    // 3. Write structured document matching schema validation parameters
     const newOrder = await PartsOrder.create({
-      buyerId: user._id, // Tracks the authenticated buyer
+      buyerId: user._id, 
       driverId: null,
       
       vehicle: {
-        year: Number(year),
-        make,
-        model
+        year: Number(vehicle.year),
+        make: vehicle.make,
+        model: vehicle.model
       },
       
       supplier: {
-        storeName,
-        storeAddress,
-        commercialOrderNumber: commercialOrderNumber.toUpperCase().trim()
+        storeName: schemaStoreEnum, // 🔥 UPDATED: Shifted to capitalized string format to satisfy schema enum constraints
+        storeAddress: fullDisplayAddress,
+        commercialOrderNumber: `AUTO-${Math.floor(100000 + Math.random() * 900000)}`
       },
       
-      manifestText,
+      manifestText: parts,
       
       deliveryLocation: {
-        address: deliveryAddress,
-        bayInstructions: bayInstructions || '',
+        address: destination.address,
+        bayInstructions: destination.name,
         geoPoint: {
           type: 'Point',
-          coordinates: [targetLongitude, targetLatitude]
+          coordinates: [Number(destination.coordinates[0]), Number(destination.coordinates[1])] // [longitude, latitude]
         }
       },
       
-      status: 'placed',
+      status: 'placed', // Retained original schema validation status keyword
       
       pricing: {
-        deliveryFee: baseDeliveryFee,
+        deliveryFee: finalDeliveryFee,
         driverPayout,
         platformCut
       }
