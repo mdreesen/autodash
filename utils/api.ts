@@ -21,7 +21,7 @@ export const getApiUrl = (): string => {
      * Replace this with your computer's actual local Wi-Fi IP address (e.g., 192.168.1.75).
      * Do not leave it as '192.168.1.XX' or your devices will fail to handshake!
      */
-    const HOST_IP = '192.168.1.XX' 
+    const HOST_IP = '192.168.1.157' 
     
     return `http://${HOST_IP}:3000`
   }
