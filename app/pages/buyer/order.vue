@@ -1,156 +1,208 @@
+<!--
+  AUTODASH COMMERCIAL BUYER DISPATCH SYSTEM ORDER CREATION
+  PAGES/BUYER/ORDER.VUE
+-->
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-// Target Workshop locations owned or utilized by buyers
-const buyerWorkshops = [
-  {
-    name: "Big Mountain Repair (Evergreen)",
-    address: "Evergreen Region, Kalispell, MT",
-    coordinates: [-114.2846, 48.2231]
+const router = useRouter()
+const isSubmitting = ref(false)
+
+// --- 1. REACTIVE FORM STATE MANAGEMENT ---
+const orderForm = ref({
+  poNumber: '',
+  urgency: 'hotshot',
+  supplierId: 'autozone-kalispell',
+  vehicle: {
+    year: '',
+    make: '',
+    model: '',
+    engineSize: '',
+    vin: '',
+    unitNumber: ''
   },
-  {
-    name: "Whitefish Automotive Care",
-    address: "W 2nd St, Whitefish, MT 59937",
-    coordinates: [-114.3411, 48.4114]
-  },
-  {
-    name: "Glacier Field Service Garage",
-    address: "Nucleus Ave, Columbia Falls, MT 59912",
-    coordinates: [-114.1832, 48.3712]
-  }
+  manifestText: '', 
+  partNumbers: ''
+})
+
+// --- 2. LOCALIZED GEOFENCED SHOP LOCATIONS ---
+const SHOP_LOCATIONS = [
+  { id: 'big-mountain-evergreen', name: 'Big Mountain Repair (Evergreen)', address: 'Evergreen Region, Kalispell, MT' },
+  { id: 'flathead-automotive', name: 'Flathead Valley Auto (South Kalispell)', address: 'South Kalispell, MT' }
 ]
+const selectedShopId = ref('big-mountain-evergreen')
 
-// --- REACTIVE STATE STORAGE BINDINGS ---
-const year = ref('2022')
-const make = ref('Ford')
-const modelName = ref('F-150')
-const partsRequested = ref('') // Text area for line item parts requests
+// --- 3. DYNAMIC PRICING STATE ---
+const deliveryCost = ref(11.13) 
 
-const selectedDestination = ref(buyerWorkshops[0])
-
-// Dynamic Valuation Vectors (Now calculated via backend proximity dispatch lookup)
-const estimatedRate = ref(0.00)
-const calculatedDistance = ref(0)
-const nearestSupplierFound = ref('')
-const isCalculating = ref(false)
-
-// --- DOOR-DASH STYLE AUTO DISPATCH HANDSHAKE ---
-async function fetchAutoDispatchMetrics() {
-  isCalculating.value = true
+// --- 4. DISPATCH AUTHORIZATION PIPELINE ---
+async function dispatchHotShotRequest() {
+  if (!orderForm.value.vehicle.make || !orderForm.value.vehicle.model || !orderForm.value.manifestText) {
+    alert('Please fulfill all mandatory fields including Year, Make, Model, and Parts Description.')
+    return
+  }
+  
+  isSubmitting.value = true
   try {
-    // The backend now takes the buyer's destination and automatically calculates
-    // the distance to the closest optimized commercial parts provider.
-    const response = await $fetch('/api/orders/auto-dispatch-quote', {
-      method: 'POST',
-      body: {
-        destinationCoords: selectedDestination.value.coordinates
-      }
-    })
+    const selectedShop = SHOP_LOCATIONS.find(s => s.id === selectedShopId.value)
     
+    const payload = {
+      poNumber: orderForm.value.poNumber || `RO-${Math.floor(1000 + Math.random() * 9000)}`,
+      urgency: orderForm.value.urgency,
+      supplier: {
+        storeName: 'AutoZone Auto Parts',
+        address: '740 US Hwy 2 W, Kalispell, MT 59901'
+      },
+      vehicle: {
+        year: Number(orderForm.value.vehicle.year) || 2022,
+        make: orderForm.value.vehicle.make,
+        model: orderForm.value.vehicle.model,
+        engineSize: orderForm.value.vehicle.engineSize || 'N/A',
+        vin: orderForm.value.vehicle.vin.toUpperCase(),
+        unitNumber: orderForm.value.vehicle.unitNumber || 'Main Shop Floor'
+      },
+      manifestText: orderForm.value.manifestText, 
+      partNumbers: orderForm.value.partNumbers ? orderForm.value.partNumbers.split(',').map(p => p.trim()).filter(Boolean) : [],
+      deliveryLocation: {
+        address: selectedShop.address,
+        bayInstructions: selectedShop.name
+      }
+    }
+
+    const response = await $fetch('/api/orders/create', {
+      method: 'POST',
+      body: payload
+    })
+
     if (response.success) {
-      estimatedRate.value = response.estimatedRate
-      calculatedDistance.value = response.distanceMiles
-      nearestSupplierFound.value = response.nearestSupplier
+      router.push('/buyer/dashboard')
     }
   } catch (err) {
-    console.error('Failed to resolve dynamic delivery cost vectors:', err)
+    console.error('Logistics Core rejection:', err.response?._data || err)
+    alert(`Submission Rejection: ${err.response?._data?.message || 'Check database validation params.'}`)
   } finally {
-    isCalculating.value = false
-  }
-}
-
-// Automatically recalculate route metrics whenever the buyer changes their delivery destination
-watch(selectedDestination, () => {
-  fetchAutoDispatchMetrics()
-}, { immediate: true })
-
-async function handleConfirmOrder() {
-  try {
-    const orderPayload = {
-      vehicle: { year: year.value, make: make.value, model: modelName.value },
-      parts: partsRequested.value,
-      destination: selectedDestination.value,
-      pricing: estimatedRate.value
-    }
-    
-    // Dispatches payload cleanly to your newly fixed backend server file
-    const data = await $fetch('/api/orders/create', {
-      method: 'POST',
-      body: orderPayload
-    })
-    
-    // 🔥 FIX: Redirect directly to your real tracking screen structure!
-    if (data.success && data.orderId) {
-      useRouter().push(`/buyer/track-order/${data.orderId}`)
-    }
-  } catch (error) {
-    console.error('Order creation failed:', error)
+    isSubmitting.value = false
   }
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-white pb-24 text-gray-900 font-sans">
-    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-100 sticky top-0 z-50">
-      <button class="p-2 hover:bg-gray-50 rounded-full transition-colors" @click="$router.back()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-gray-800"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+  <div class="min-h-screen bg-gray-50/40 pb-28 text-gray-900 font-sans antialiased">
+    
+    <!-- TOP STICKY COMPACT NAVBAR -->
+    <header class="p-4 bg-white border-b border-gray-100/80 sticky top-0 z-50 flex items-center justify-between shadow-xs">
+      <button @click="$router.push('/buyer/dashboard')", class="p-2 hover:bg-gray-50 rounded-full transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-gray-800">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
       </button>
-      <h1 class="text-base font-bold text-gray-900 tracking-tight">Request Hot-Shot Delivery</h1>
-      <div class="w-9 h-9 flex items-center justify-center rounded-full bg-orange-50 text-orange-600 font-bold text-xs">MB</div>
+      <h1 class="text-sm font-black tracking-tight text-gray-900 mx-auto transform -translate-x-3">Request Hot-Shot Delivery</h1>
+      <div class="w-7 h-7 rounded-full bg-orange-100 text-orange-600 font-bold text-[10px] flex items-center justify-center uppercase">MB</div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-6">
+    <main class="max-w-md mx-auto p-4 space-y-5">
       
-      <section class="border border-gray-100 rounded-2xl p-4 bg-white shadow-xs space-y-4">
-        <div class="flex items-center space-x-2 pb-2 border-b border-gray-50">
-          <span class="text-xs font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md">01</span>
-          <h3 class="text-sm font-bold tracking-tight text-gray-800 uppercase">Target Vehicle</h3>
+      <!-- ========================================== -->
+      <!-- SECTION 01: TARGET VEHICLE SPECIFICATIONS  -->
+      <!-- ========================================== -->
+      <section class="bg-white border border-gray-100 rounded-3xl p-5 shadow-2xs space-y-4">
+        <div class="flex items-center space-x-2.5">
+          <span class="bg-orange-50 text-orange-600 text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md uppercase">01</span>
+          <h3 class="text-xs font-black text-gray-800 uppercase tracking-wider">Target Vehicle Specs</h3>
         </div>
-        <div class="grid grid-cols-3 gap-3">
-          <input type="text" v-model="year" placeholder="Year" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm" />
-          <input type="text" v-model="make" placeholder="Make" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm col-span-2" />
+        
+        <!-- Year, Make input row -->
+        <div class="grid grid-cols-2 gap-3.5">
+          <input v-model="orderForm.vehicle.year" type="number" placeholder="Year" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" />
+          <input v-model="orderForm.vehicle.make" type="text" placeholder="Make" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" />
         </div>
-        <input type="text" v-model="modelName" placeholder="Model (e.g. F-150)" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm" />
+
+        <!-- Model, Engine input row -->
+        <div class="grid grid-cols-2 gap-3.5">
+          <input v-model="orderForm.vehicle.model" type="text" placeholder="Model" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" />
+          <input v-model="orderForm.vehicle.engineSize" type="text" placeholder="Engine size (e.g. 5.7L)" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" />
+        </div>
+
+        <!-- Full-Width VIN Input Field -->
+        <input v-model="orderForm.vehicle.vin" type="text" placeholder="VIN (17-Digit Identifier)" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-mono font-bold tracking-wide uppercase text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" maxlength="17" />
+
+        <!-- Target Bay / Unit Description -->
+        <input v-model="orderForm.vehicle.unitNumber" type="text" placeholder="Bay Target / Fleet Unit # (e.g. Bay 3 / White Silverado)" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" />
       </section>
 
-      <section class="border border-gray-100 rounded-2xl p-4 bg-white shadow-xs space-y-4">
-        <div class="flex items-center space-x-2 pb-2 border-b border-gray-50">
-          <span class="text-xs font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md">02</span>
-          <h3 class="text-sm font-bold tracking-tight text-gray-800 uppercase">Parts Needed</h3>
+      <!-- ========================================== -->
+      <!-- SECTION 02: PARTS CONTENT MANIFEST INPUT   -->
+      <!-- ========================================== -->
+      <section class="bg-white border border-gray-100 rounded-3xl p-5 shadow-2xs space-y-4">
+        <div class="flex items-center space-x-2.5">
+          <span class="bg-orange-50 text-orange-600 text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md uppercase">02</span>
+          <h3 class="text-xs font-black text-gray-800 uppercase tracking-wider">Parts & Account Info</h3>
         </div>
-        <textarea 
-          v-model="partsRequested" 
-          rows="2" 
-          placeholder="List required parts here (e.g., Starter motor, front brake pads...)" 
-          class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none"
-        ></textarea>
+
+        <!-- Manifest textual string block -->
+        <div class="relative">
+          <input 
+            v-model="orderForm.manifestText" 
+            type="text" 
+            placeholder="Parts description (e.g. Front Brake Pads)" 
+            class="w-full bg-white border border-gray-200 rounded-xl pl-4 pr-12 py-4 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" 
+          />
+          <div class="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-gray-300">✨</div>
+        </div>
+
+        <!-- SKU part numbers, PO numbers input row -->
+        <div class="grid grid-cols-2 gap-3.5">
+          <input v-model="orderForm.partNumbers" type="text" placeholder="SKUs/Part numbers (optional)" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-mono text-gray-600 focus:outline-none focus:border-orange-500 transition-colors" />
+          <input v-model="orderForm.poNumber" type="text" placeholder="PO / Repair Order #" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 transition-colors" />
+        </div>
       </section>
 
-      <section class="border border-gray-100 rounded-2xl p-4 bg-white shadow-xs space-y-4">
-        <div class="flex items-center space-x-2 pb-2 border-b border-gray-50">
-          <span class="text-xs font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md">03</span>
-          <h3 class="text-sm font-bold tracking-tight text-gray-800 uppercase">Your Shop Location</h3>
+      <!-- ========================================== -->
+      <!-- SECTION 03: REGIONAL SHOP GEOFENCED DROP   -->
+      <!-- ========================================== -->
+      <section class="bg-white border border-gray-100 rounded-3xl p-5 shadow-2xs space-y-4">
+        <div class="flex items-center space-x-2.5">
+          <span class="bg-orange-50 text-orange-600 text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md uppercase">03</span>
+          <h3 class="text-xs font-black text-gray-800 uppercase tracking-wider">Your Shop Location</h3>
         </div>
-        <select v-model="selectedDestination" class="w-full p-3 border border-gray-100 bg-gray-50/50 rounded-xl text-sm font-medium text-gray-800">
-          <option v-for="shop in buyerWorkshops" :key="shop.name" :value="shop">{{ shop.name }}</option>
-        </select>
+
+        <div class="space-y-1 relative">
+          <select 
+            v-model="selectedShopId" 
+            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-500 appearance-none transition-colors"
+          >
+            <option v-for="shop in SHOP_LOCATIONS" :key="shop.id" :value="shop.id">
+              {{ shop.name }}
+            </option>
+          </select>
+          <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+          </div>
+        </div>
       </section>
 
-      <section class="p-4 border border-gray-100 rounded-2xl bg-gray-50/50 space-y-1 relative overflow-hidden">
-        <div v-if="isCalculating" class="absolute inset-0 bg-white/75 flex items-center justify-center rounded-2xl text-xs font-bold text-orange-500">
-          Finding nearest supplier node...
-        </div>
-        <p class="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Estimated Delivery Cost</p>
+      <!-- ========================================== -->
+      <!-- SUMMARY & DYNAMIC BILLING CALCULATOR UNIT -->
+      <!-- ========================================== -->
+      <section class="bg-white border border-gray-100 rounded-3xl p-5 shadow-2xs space-y-1">
+        <p class="text-[9px] font-black uppercase text-gray-400 tracking-wider">Estimated Delivery Cost</p>
         <div class="flex items-baseline space-x-1">
-          <h2 class="text-3xl font-black text-gray-900">${{ estimatedRate.toFixed(2) }}</h2>
+          <span class="text-2xl font-black text-gray-900 tracking-tight">${{ deliveryCost.toFixed(2) }}</span>
         </div>
-        <p class="text-[11px] text-gray-400 leading-normal" v-if="nearestSupplierFound">
-          Sourced automatically from <strong class="text-gray-600 font-semibold">{{ nearestSupplierFound }}</strong> ({{ calculatedDistance }} miles away).
+        <p class="text-[10px] text-gray-400 font-medium leading-normal pt-1">
+          Sourced automatically from <span class="font-bold text-gray-600">AutoZone Auto Parts - Kalispell</span> (2.8 miles away).
         </p>
       </section>
 
-      <button @click="handleConfirmOrder" class="w-full py-4 bg-orange-500 text-white font-extrabold text-sm rounded-2xl shadow-lg uppercase tracking-wide">
-        Submit Hot-Shot Request
+      <!-- TRANSACTION TRIGGER SUBMIT ACTION -->
+      <button 
+        @click="dispatchHotShotRequest"
+        :disabled="isSubmitting"
+        class="w-full py-4 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-md transition-all active:scale-[0.995] flex items-center justify-center"
+      >
+        <span v-if="isSubmitting">Processing Dispatch Registry...</span>
+        <span v-else>Submit Hot-Shot Request</span>
       </button>
 
     </main>

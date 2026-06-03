@@ -1,5 +1,5 @@
 /**
- * COURIER PROFILE & ACTIVE TASK HANDSHAKE RECOVERY LAYOUT
+ * DYNAMIC PROFILE & ACTIVE TASK HANDSHAKE RECOVERY LAYOUT
  * SERVER/API/DRIVER/ME.GET.TS
  */
 import mongoose, { type Model } from 'mongoose'
@@ -20,27 +20,37 @@ export default defineEventHandler(async (event) => {
       return { success: false, message: 'Driver document footprint missing.' }
     }
 
-    // 2. Check if this driver was left assigned to an open delivery job before refresh
+    // 2. CRITICAL LIFE-CYCLE FIX: Check if driver was left assigned to an open delivery job before refresh
+    // Includes both 'accepted' and 'in_transit' so current journey steps survive browser reloads
     const activeOrderRecord = await PartsOrder.findOne({
       driverId: driverId,
-      status: 'accepted'
+      status: { $in: ['accepted', 'in_transit'] }
     }).lean()
 
     // Map the database names cleanly to UI property variables if found
     let formattedActiveJob = null
     if (activeOrderRecord) {
+      const rawStoreName = activeOrderRecord.supplier?.storeName || 'Commercial Warehouse'
+      
+      // Dynamic store formatting fallback handler
+      let displayStoreName = rawStoreName
+      if (rawStoreName.toLowerCase() === 'oreilly') displayStoreName = "O'Reilly Auto Parts"
+      else if (rawStoreName.toLowerCase() === 'napa') displayStoreName = "NAPA Auto Parts"
+      else if (rawStoreName.toLowerCase() === 'autozone') displayStoreName = "AutoZone Auto Parts"
+
       formattedActiveJob = {
         _id: activeOrderRecord._id.toString(),
-        nearestSupplier: activeOrderRecord.supplier?.storeName === 'oreilly' 
-          ? "O'Reilly Auto Parts" 
-          : activeOrderRecord.supplier?.storeName === 'napa' 
-            ? "NAPA Auto Parts" 
-            : "AutoZone Auto Parts",
+        // Now dynamically handles any custom string input passed up by the order payload form!
+        nearestSupplier: displayStoreName,
         destination: {
           name: activeOrderRecord.deliveryLocation?.bayInstructions || "Workshop Destination",
           address: activeOrderRecord.deliveryLocation?.address || "Address Missing"
         },
-        pricing: activeOrderRecord.pricing?.deliveryFee || 14.50,
+        // Feeds the complete pricing breakdown structure straight into the driver portal template
+        pricing: {
+          driverPayout: activeOrderRecord.pricing?.driverPayout || 11.13,
+          deliveryFee: activeOrderRecord.pricing?.deliveryFee || 13.91
+        },
         status: activeOrderRecord.status
       }
     }

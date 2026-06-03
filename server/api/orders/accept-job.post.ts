@@ -55,7 +55,16 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    console.log(`📦 [Logistics Core] Order ${orderId} successfully locked by driver ${driverId}`)
+    console.log(`📦 [Logistics Core] Order ${orderId} successfully locked by driver ${driverId}`);
+
+    // REAL-TIME PUSH: Tell the buyer that a courier has locked the contract
+    EventHub.sendToBuyer(orderId, 'status_update', {
+      status: 'accepted',
+      driver: {
+        name: 'Michael Dreesen', // Pass dynamic name if auth middleware is pinned
+        coords: null
+      }
+    })
 
     return {
       success: true,

@@ -30,13 +30,12 @@ export default defineEventHandler(async (event) => {
       { returnDocument: 'after' }
     )
 
-    console.log(`🏁 [Logistics Core] Order ${orderId} marked completed. Cargo dropped off.`)
+    console.log(`🏁 [Logistics Core] Order ${orderId} marked completed. Cargo dropped off.`);
 
-    return {
-      success: true,
-      message: 'Delivery manifest marked finalized. Earnings routed to driver wallet balance.',
-      order: completedOrder
-    }
+    // REAL-TIME PUSH: Close out the buyer's tracking panel view cleanly
+    EventHub.sendToBuyer(orderId, 'status_update', { status: 'completed' })
+
+    return { success: true, order: completedOrder }
 
   } catch (error: any) {
     console.error('❌ Failed to finalize order completion lifecycle:', error)

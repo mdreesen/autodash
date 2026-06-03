@@ -1,5 +1,5 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { tmpdir } from 'node:os';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, createError, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, parseCookies, setCookie, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, deleteCookie, getResponseStatusText } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/h3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, createError, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, parseCookies, setCookie, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, deleteCookie, sendStream, getResponseStatusText } from 'file:///Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/h3/dist/index.mjs';
 import { Server } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
 import crypto$1 from 'node:crypto';
@@ -2232,7 +2232,22 @@ _PH8GSJK0anC4vq6gGL2GtrgXrnJTWU3_DzXwsYs4RAo,
 _wH6JrtIxmaSoA8lCPWFnE9z4lQeXW6H5z3l5aymEQw
 ];
 
-const assets = {};
+const assets = {
+  "/index.mjs": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"292e7-zMZWf1eBnQa/S+fRvBtzsyXR+5g\"",
+    "mtime": "2026-06-03T16:54:16.828Z",
+    "size": 168679,
+    "path": "index.mjs"
+  },
+  "/index.mjs.map": {
+    "type": "application/json",
+    "etag": "\"9b01d-/LMxv26zJpXp1y7zK+/gA6e2Djc\"",
+    "mtime": "2026-06-03T16:54:16.830Z",
+    "size": 634909,
+    "path": "index.mjs.map"
+  }
+};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -2816,8 +2831,10 @@ const _lazy_hKeC5m = () => Promise.resolve().then(function () { return autoDispa
 const _lazy_VpmoE3 = () => Promise.resolve().then(function () { return calculateRate_post$1; });
 const _lazy_3v8rf4 = () => Promise.resolve().then(function () { return completeJob_post$1; });
 const _lazy_3a7_l7 = () => Promise.resolve().then(function () { return create_post$1; });
+const _lazy_KyC_gJ = () => Promise.resolve().then(function () { return pickupJob_post$1; });
 const _lazy_Nm5O2A = () => Promise.resolve().then(function () { return track__id__get$1; });
 const _lazy_qcCVQj = () => Promise.resolve().then(function () { return index_get$1; });
+const _lazy_0yRHII = () => Promise.resolve().then(function () { return stream_get$1; });
 const _lazy_NmmIOD = () => Promise.resolve().then(function () { return renderer; });
 
 const handlers = [
@@ -2844,8 +2861,10 @@ const handlers = [
   { route: '/api/orders/calculate-rate', handler: _lazy_VpmoE3, lazy: true, middleware: false, method: "post" },
   { route: '/api/orders/complete-job', handler: _lazy_3v8rf4, lazy: true, middleware: false, method: "post" },
   { route: '/api/orders/create', handler: _lazy_3a7_l7, lazy: true, middleware: false, method: "post" },
+  { route: '/api/orders/pickup-job', handler: _lazy_KyC_gJ, lazy: true, middleware: false, method: "post" },
   { route: '/api/orders/track-:id', handler: _lazy_Nm5O2A, lazy: true, middleware: false, method: "get" },
   { route: '/api/orders/track/:id', handler: _lazy_qcCVQj, lazy: true, middleware: false, method: "get" },
+  { route: '/api/stream', handler: _lazy_0yRHII, lazy: true, middleware: false, method: "get" },
   { route: '/__nuxt_error', handler: _lazy_NmmIOD, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: handler$1, lazy: false, middleware: false, method: undefined },
   { route: '/**', handler: _lazy_NmmIOD, lazy: true, middleware: false, method: undefined }
@@ -3426,16 +3445,11 @@ const partsOrderSchema = new Schema({
   supplier: {
     storeName: {
       type: String,
-      required: true,
-      enum: ["O'Reilly Auto Parts", "NAPA Auto Parts", "AutoZone", "Advance Auto Parts", "Independent"]
+      required: true
+      // Just require a string, remove the strict enum array!
     },
     storeAddress: { type: String, required: true },
-    commercialOrderNumber: {
-      type: String,
-      required: true,
-      uppercase: true,
-      trim: true
-    }
+    commercialOrderNumber: { type: String, required: true }
   },
   // 4. Manifest Inventory Payload
   manifestText: {
@@ -3489,11 +3503,11 @@ const partsOrderSchema = new Schema({
 partsOrderSchema.index({ "deliveryLocation.geoPoint": "2dsphere" });
 const PartsOrderImport = mongoose.models.PartsOrder || mongoose.model("PartsOrder", partsOrderSchema);
 
-const PartsOrder$d = PartsOrderImport;
+const PartsOrder$f = PartsOrderImport;
 const dashboard_get = defineEventHandler(async (event) => {
   var _a, _b, _c, _d, _e, _f, _g;
   try {
-    const allOrders = await PartsOrder$d.find().sort({ createdAt: -1 }).lean();
+    const allOrders = await PartsOrder$f.find().sort({ createdAt: -1 }).lean();
     const liveDispatches = [];
     const pastDeliveries = [];
     for (const order of allOrders) {
@@ -3536,7 +3550,7 @@ const dashboard_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePro
   default: dashboard_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$c = PartsOrderImport;
+const PartsOrder$e = PartsOrderImport;
 const User$5 = UserImport;
 const index_get$4 = defineEventHandler(async (event) => {
   var _a;
@@ -3546,7 +3560,7 @@ const index_get$4 = defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: "Authentication missing." });
   }
   try {
-    const order = await PartsOrder$c.findById(orderId).lean();
+    const order = await PartsOrder$e.findById(orderId).lean();
     if (!order) {
       throw createError({ statusCode: 404, message: "Order manifest not found." });
     }
@@ -3587,7 +3601,7 @@ const index_get$5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
   default: index_get$4
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$b = PartsOrderImport;
+const PartsOrder$d = PartsOrderImport;
 const availableOrders_get = defineEventHandler(async (event) => {
   const user = event.context.user;
   if (!(user == null ? void 0 : user._id) || user.role !== "driver") {
@@ -3597,7 +3611,8 @@ const availableOrders_get = defineEventHandler(async (event) => {
     });
   }
   try {
-    const openOrders = await PartsOrder$b.find({ status: "placed" }).sort({ createdAt: -1 }).populate("buyerId", "name").lean();
+    await connectDB();
+    const openOrders = await PartsOrder$d.find({ status: "placed" }).sort({ createdAt: -1 }).populate("buyerId", "name").lean();
     return {
       success: true,
       orders: openOrders
@@ -3616,10 +3631,11 @@ const availableOrders_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.def
   default: availableOrders_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$a = PartsOrderImport;
+const PartsOrder$c = PartsOrderImport;
 const fetchJobs_get = defineEventHandler(async (event) => {
   try {
-    const activeOffers = await PartsOrder$a.find({
+    await connectDB();
+    const activeOffers = await PartsOrder$c.find({
       status: "placed",
       driverId: null
     }).sort({ createdAt: -1 }).lean();
@@ -3672,12 +3688,12 @@ const fetchJobs_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePro
   default: fetchJobs_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$9 = PartsOrderImport;
+const PartsOrder$b = PartsOrderImport;
 const history_get = defineEventHandler(async (event) => {
   const user = event.context.user;
   const driverId = (user == null ? void 0 : user._id) || new mongoose.Types.ObjectId("6a1f377861d1ee56fc110dab");
   try {
-    const totalHistoryLogs = await PartsOrder$9.find({ driverId }).sort({ createdAt: -1 }).lean();
+    const totalHistoryLogs = await PartsOrder$b.find({ driverId }).sort({ createdAt: -1 }).lean();
     let totalCompletions = 0;
     let totalLifetimePayout = 0;
     const formattedOrders = totalHistoryLogs.map((order) => {
@@ -3726,7 +3742,7 @@ const history_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePrope
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const User$4 = UserImport;
-const PartsOrder$8 = PartsOrderImport;
+const PartsOrder$a = PartsOrderImport;
 const me_get = defineEventHandler(async (event) => {
   var _a, _b, _c, _d, _e;
   const user = event.context.user;
@@ -3736,20 +3752,30 @@ const me_get = defineEventHandler(async (event) => {
     if (!driverRecord) {
       return { success: false, message: "Driver document footprint missing." };
     }
-    const activeOrderRecord = await PartsOrder$8.findOne({
+    const activeOrderRecord = await PartsOrder$a.findOne({
       driverId,
-      status: "accepted"
+      status: { $in: ["accepted", "in_transit"] }
     }).lean();
     let formattedActiveJob = null;
     if (activeOrderRecord) {
+      const rawStoreName = ((_a = activeOrderRecord.supplier) == null ? void 0 : _a.storeName) || "Commercial Warehouse";
+      let displayStoreName = rawStoreName;
+      if (rawStoreName.toLowerCase() === "oreilly") displayStoreName = "O'Reilly Auto Parts";
+      else if (rawStoreName.toLowerCase() === "napa") displayStoreName = "NAPA Auto Parts";
+      else if (rawStoreName.toLowerCase() === "autozone") displayStoreName = "AutoZone Auto Parts";
       formattedActiveJob = {
         _id: activeOrderRecord._id.toString(),
-        nearestSupplier: ((_a = activeOrderRecord.supplier) == null ? void 0 : _a.storeName) === "oreilly" ? "O'Reilly Auto Parts" : ((_b = activeOrderRecord.supplier) == null ? void 0 : _b.storeName) === "napa" ? "NAPA Auto Parts" : "AutoZone Auto Parts",
+        // Now dynamically handles any custom string input passed up by the order payload form!
+        nearestSupplier: displayStoreName,
         destination: {
-          name: ((_c = activeOrderRecord.deliveryLocation) == null ? void 0 : _c.bayInstructions) || "Workshop Destination",
-          address: ((_d = activeOrderRecord.deliveryLocation) == null ? void 0 : _d.address) || "Address Missing"
+          name: ((_b = activeOrderRecord.deliveryLocation) == null ? void 0 : _b.bayInstructions) || "Workshop Destination",
+          address: ((_c = activeOrderRecord.deliveryLocation) == null ? void 0 : _c.address) || "Address Missing"
         },
-        pricing: ((_e = activeOrderRecord.pricing) == null ? void 0 : _e.deliveryFee) || 14.5,
+        // Feeds the complete pricing breakdown structure straight into the driver portal template
+        pricing: {
+          driverPayout: ((_d = activeOrderRecord.pricing) == null ? void 0 : _d.driverPayout) || 11.13,
+          deliveryFee: ((_e = activeOrderRecord.pricing) == null ? void 0 : _e.deliveryFee) || 13.91
+        },
         status: activeOrderRecord.status
       };
     }
@@ -3823,7 +3849,80 @@ const toggleAvailability_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object
   default: toggleAvailability_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+class CentralEventHub {
+  constructor() {
+    // Use unique symbol keys to completely isolate memory blocks inside globalThis
+    __publicField(this, "driversKey", /* @__PURE__ */ Symbol.for("autodash.drivers"));
+    __publicField(this, "buyersKey", /* @__PURE__ */ Symbol.for("autodash.buyers"));
+    if (!globalThis[this.driversKey]) {
+      globalThis[this.driversKey] = /* @__PURE__ */ new Map();
+    }
+    if (!globalThis[this.buyersKey]) {
+      globalThis[this.buyersKey] = /* @__PURE__ */ new Map();
+    }
+  }
+  get connectedDrivers() {
+    return globalThis[this.driversKey];
+  }
+  get connectedBuyers() {
+    return globalThis[this.buyersKey];
+  }
+  registerDriver(driverId, controller) {
+    this.connectedDrivers.set(driverId, controller);
+    console.log(`\u{1F4E1} [Event Hub] Driver ${driverId} linked up. Universal Connected Total: ${this.connectedDrivers.size}`);
+  }
+  registerBuyer(orderId, controller) {
+    this.connectedBuyers.set(orderId, controller);
+    console.log(`\u{1F4E1} [Event Hub] Buyer tracking order ${orderId}. Universal Connected Total: ${this.connectedBuyers.size}`);
+  }
+  broadcastToDrivers(eventName, data) {
+    console.log(`\u{1F680} [Event Hub] Pushing '${eventName}' to all ${this.connectedDrivers.size} active driver sockets...`);
+    const payload = `event: ${eventName}
+data: ${JSON.stringify(data)}
+
+`;
+    for (const [driverId, controller] of this.connectedDrivers.entries()) {
+      try {
+        controller.enqueue(new TextEncoder().encode(payload));
+        console.log(`   \u{1F449} Successfully streamed packet to Driver ID: ${driverId}`);
+      } catch (err) {
+        console.warn(`   \u274C Failed streaming to driver ${driverId}, dropping stale connection.`);
+        this.connectedDrivers.delete(driverId);
+      }
+    }
+  }
+  sendToBuyer(orderId, eventName, data) {
+    const controller = this.connectedBuyers.get(orderId);
+    if (controller) {
+      try {
+        const payload = `event: ${eventName}
+data: ${JSON.stringify(data)}
+
+`;
+        controller.enqueue(new TextEncoder().encode(payload));
+      } catch (err) {
+        this.connectedBuyers.delete(orderId);
+      }
+    }
+  }
+  unregister(id) {
+    if (this.connectedDrivers.has(id)) {
+      this.connectedDrivers.delete(id);
+      console.log(`\u{1F4E1} [Event Hub] Driver detached. Remaining universal connections: ${this.connectedDrivers.size}`);
+    }
+    if (this.connectedBuyers.has(id)) {
+      this.connectedBuyers.delete(id);
+      console.log(`\u{1F4E1} [Event Hub] Buyer detached. Remaining universal connections: ${this.connectedBuyers.size}`);
+    }
+  }
+}
+const EventHub = new CentralEventHub();
+
 const User$2 = UserImport;
+const PartsOrder$9 = PartsOrderImport;
 const updateLocation_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { coordinates } = body;
@@ -3836,6 +3935,7 @@ const updateLocation_post = defineEventHandler(async (event) => {
     });
   }
   try {
+    await connectDB();
     await User$2.findByIdAndUpdate(
       driverId,
       {
@@ -3846,10 +3946,23 @@ const updateLocation_post = defineEventHandler(async (event) => {
         }
       }
     );
+    const activeOrder = await PartsOrder$9.findOne({
+      driverId,
+      status: { $in: ["accepted", "in_transit"] }
+    }).select("_id").lean();
+    if (activeOrder) {
+      EventHub.sendToBuyer(activeOrder._id.toString(), "location_update", {
+        // Inverts to Leaflet [latitude, longitude] array orientation rules
+        coords: [Number(coordinates[1]), Number(coordinates[0])]
+      });
+    }
     return { success: true };
   } catch (error) {
     console.error("Telemetry write fault:", error);
-    throw createError({ statusCode: 500, message: "Failed to commit telemetry coordinates." });
+    throw createError({
+      statusCode: 500,
+      message: "Failed to commit telemetry coordinates and broadcast real-time streaming updates."
+    });
   }
 });
 
@@ -3858,7 +3971,7 @@ const updateLocation_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.def
   default: updateLocation_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$7 = PartsOrderImport;
+const PartsOrder$8 = PartsOrderImport;
 const index_get$2 = defineEventHandler(async (event) => {
   const user = event.context.user;
   if (!(user == null ? void 0 : user._id)) {
@@ -3869,7 +3982,7 @@ const index_get$2 = defineEventHandler(async (event) => {
   }
   const orderId = getRouterParam(event, "id");
   try {
-    const order = await PartsOrder$7.findById(orderId).lean();
+    const order = await PartsOrder$8.findById(orderId).lean();
     if (!order) {
       throw createError({
         statusCode: 404,
@@ -3903,7 +4016,7 @@ const index_get$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePropert
   default: index_get$2
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$6 = PartsOrderImport;
+const PartsOrder$7 = PartsOrderImport;
 const status_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const user = event.context.user;
@@ -3923,7 +4036,7 @@ const status_post = defineEventHandler(async (event) => {
     });
   }
   try {
-    const order = await PartsOrder$6.findById(orderId);
+    const order = await PartsOrder$7.findById(orderId);
     if (!order) {
       throw createError({ statusCode: 404, message: "Target order context record missing." });
     }
@@ -3959,7 +4072,7 @@ const status_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePrope
   default: status_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$5 = PartsOrderImport;
+const PartsOrder$6 = PartsOrderImport;
 const acceptJob_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { orderId } = body;
@@ -3973,7 +4086,7 @@ const acceptJob_post = defineEventHandler(async (event) => {
   }
   try {
     await connectDB();
-    const finalizedOrder = await PartsOrder$5.findOneAndUpdate(
+    const finalizedOrder = await PartsOrder$6.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(orderId),
         status: "placed",
@@ -3999,6 +4112,14 @@ const acceptJob_post = defineEventHandler(async (event) => {
       });
     }
     console.log(`\u{1F4E6} [Logistics Core] Order ${orderId} successfully locked by driver ${driverId}`);
+    EventHub.sendToBuyer(orderId, "status_update", {
+      status: "accepted",
+      driver: {
+        name: "Michael Dreesen",
+        // Pass dynamic name if auth middleware is pinned
+        coords: null
+      }
+    });
     return {
       success: true,
       message: "Hot-shot dispatch route secured. Proceeding to supplier counter.",
@@ -4018,7 +4139,7 @@ const acceptJob_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePr
   default: acceptJob_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$4 = PartsOrderImport;
+const PartsOrder$5 = PartsOrderImport;
 const accept_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const user = event.context.user;
@@ -4036,7 +4157,7 @@ const accept_post = defineEventHandler(async (event) => {
     });
   }
   try {
-    const securedOrder = await PartsOrder$4.findOneAndUpdate(
+    const securedOrder = await PartsOrder$5.findOneAndUpdate(
       {
         _id: orderId,
         status: "placed"
@@ -4176,7 +4297,7 @@ const calculateRate_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defi
   default: calculateRate_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$3 = PartsOrderImport;
+const PartsOrder$4 = PartsOrderImport;
 const completeJob_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { orderId } = body;
@@ -4187,7 +4308,7 @@ const completeJob_post = defineEventHandler(async (event) => {
     });
   }
   try {
-    const completedOrder = await PartsOrder$3.findByIdAndUpdate(
+    const completedOrder = await PartsOrder$4.findByIdAndUpdate(
       new mongoose.Types.ObjectId(orderId),
       {
         $set: {
@@ -4198,11 +4319,8 @@ const completeJob_post = defineEventHandler(async (event) => {
       { returnDocument: "after" }
     );
     console.log(`\u{1F3C1} [Logistics Core] Order ${orderId} marked completed. Cargo dropped off.`);
-    return {
-      success: true,
-      message: "Delivery manifest marked finalized. Earnings routed to driver wallet balance.",
-      order: completedOrder
-    };
+    EventHub.sendToBuyer(orderId, "status_update", { status: "completed" });
+    return { success: true, order: completedOrder };
   } catch (error) {
     console.error("\u274C Failed to finalize order completion lifecycle:", error);
     throw createError({
@@ -4217,99 +4335,101 @@ const completeJob_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.define
   default: completeJob_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const PartsOrder$2 = PartsOrderImport;
-const HUB_COORDINATE_MAP = {
-  "O'Reilly": [-114.1974, 48.3644],
-  "AutoZone": [-114.3292, 48.1965],
-  "NAPA": [-114.3324, 48.4022]
-};
+const PartsOrder$3 = PartsOrderImport;
 const create_post = defineEventHandler(async (event) => {
+  console.log("\u{1F4EC} [Order API] Received incoming order payload from buyer form...");
   const body = await readBody(event);
+  const {
+    poNumber,
+    urgency,
+    supplier,
+    vehicle,
+    manifestText,
+    partNumbers,
+    deliveryLocation
+  } = body;
+  if (!(vehicle == null ? void 0 : vehicle.make) || !(vehicle == null ? void 0 : vehicle.model) || !manifestText) {
+    console.warn("\u26A0\uFE0F [Order API] Aborted. Missing required payload properties.");
+    throw createError({
+      statusCode: 400,
+      message: "Mandatory vehicle specifications or item manifests are missing."
+    });
+  }
   const user = event.context.user;
-  if (!(user == null ? void 0 : user._id)) {
-    throw createError({
-      statusCode: 401,
-      message: "Authentication trace missing. Please log in to request couriers."
-    });
-  }
-  const { vehicle, parts, destination, pricing } = body;
-  if (!vehicle || !vehicle.year || !vehicle.make || !vehicle.model) {
-    throw createError({
-      statusCode: 400,
-      message: "Target vehicle specifications are missing or incomplete."
-    });
-  }
-  if (!parts || !parts.trim()) {
-    throw createError({
-      statusCode: 400,
-      message: "Parts line items or manifest text cannot be empty."
-    });
-  }
-  if (!destination || !destination.name || !destination.address || !destination.coordinates) {
-    throw createError({
-      statusCode: 400,
-      message: "Destination workshop destination vectors are missing."
-    });
-  }
+  const activeBuyerId = (user == null ? void 0 : user._id) || new mongoose.Types.ObjectId("6a1f3a7e7c3b74a0bdde377e");
   try {
-    await connectDB();
-    let schemaStoreEnum = "AutoZone";
-    let fullDisplayAddress = "740 US Hwy 2 W, Kalispell, MT";
-    if (destination.name.includes("Whitefish")) {
-      schemaStoreEnum = "NAPA";
-      fullDisplayAddress = "6435 US-93, Whitefish, MT";
-    } else if (destination.name.includes("Glacier") || destination.name.includes("Columbia Falls")) {
-      schemaStoreEnum = "O'Reilly";
-      fullDisplayAddress = "1405 9th St W, Columbia Falls, MT";
-    }
-    const supplierCoords = HUB_COORDINATE_MAP[schemaStoreEnum];
-    const finalDeliveryFee = pricing ? Number(pricing) : 14.5;
-    const DRIVER_CUT_RATIO = 0.85;
-    const driverPayout = Number((finalDeliveryFee * DRIVER_CUT_RATIO).toFixed(2));
-    const platformCut = Number((finalDeliveryFee - driverPayout).toFixed(2));
-    const newOrder = await PartsOrder$2.create({
-      buyerId: user._id,
+    const isUrgent = urgency === "hotshot";
+    const baseFee = isUrgent ? 12 : 7;
+    const perMileFee = 1.5;
+    const travelMiles = 4.3;
+    const deliveryFee = Number((baseFee + travelMiles * perMileFee).toFixed(2));
+    const DRIVER_CUT_RATIO = 0.8;
+    const driverPayout = Number((deliveryFee * DRIVER_CUT_RATIO).toFixed(2));
+    const platformCut = Number((deliveryFee - driverPayout).toFixed(2));
+    console.log("\u{1F5C4}\uFE0F [Order API] Attempting database document insertion into Atlas...");
+    const newOrderDocument = await PartsOrder$3.create({
+      buyerId: activeBuyerId,
       driverId: null,
-      vehicle: {
-        year: Number(vehicle.year),
-        make: vehicle.make,
-        model: vehicle.model
-      },
+      status: "placed",
+      poNumber,
+      urgency,
       supplier: {
-        storeName: schemaStoreEnum,
-        // 🔥 UPDATED: Shifted to capitalized string format to satisfy schema enum constraints
-        storeAddress: fullDisplayAddress,
+        // Enforce plain clean strings; prevents schema enum rejection loops!
+        storeName: (supplier == null ? void 0 : supplier.storeName) || "AutoZone Auto Parts",
+        storeAddress: (supplier == null ? void 0 : supplier.storeAddress) || (supplier == null ? void 0 : supplier.address) || "740 US Hwy 2 W, Kalispell, MT",
         commercialOrderNumber: `AUTO-${Math.floor(1e5 + Math.random() * 9e5)}`
       },
-      manifestText: parts,
-      deliveryLocation: {
-        address: destination.address,
-        bayInstructions: destination.name,
-        geoPoint: {
-          type: "Point",
-          coordinates: [Number(destination.coordinates[0]), Number(destination.coordinates[1])]
-          // [longitude, latitude]
-        }
+      vehicle: {
+        year: Number(vehicle.year) || 2022,
+        make: vehicle.make,
+        model: vehicle.model,
+        engineSize: vehicle.engineSize || "N/A",
+        vin: (vehicle.vin || "").toUpperCase(),
+        unitNumber: vehicle.unitNumber || "Main Shop Floor"
       },
-      status: "placed",
-      // Retained original schema validation status keyword
+      manifestText,
+      partNumbers: partNumbers || [],
       pricing: {
-        deliveryFee: finalDeliveryFee,
+        deliveryFee,
         driverPayout,
         platformCut
-      }
+      },
+      deliveryLocation: {
+        address: (deliveryLocation == null ? void 0 : deliveryLocation.address) || "Evergreen Region, Kalispell, MT",
+        bayInstructions: (deliveryLocation == null ? void 0 : deliveryLocation.bayInstructions) || "Main Service Center",
+        geoPoint: {
+          type: "Point",
+          coordinates: [-114.2846, 48.2231]
+        }
+      },
+      createdAt: /* @__PURE__ */ new Date(),
+      updatedAt: /* @__PURE__ */ new Date()
     });
+    console.log(`\u2705 [Order API] MongoDB Write Success! Document ID: ${newOrderDocument._id}`);
+    console.log("\u{1F4E2} [Order API] Initializing EventHub driver broadcast stream push...");
+    EventHub.broadcastToDrivers("new_job", {
+      _id: newOrderDocument._id.toString(),
+      status: newOrderDocument.status,
+      nearestSupplier: newOrderDocument.supplier.storeName,
+      destination: {
+        name: newOrderDocument.deliveryLocation.bayInstructions,
+        address: newOrderDocument.deliveryLocation.address
+      },
+      pricing: {
+        driverPayout
+      },
+      manifestText: newOrderDocument.manifestText
+    });
+    console.log("\u2728 [Order API] EventHub broadcast task cycle complete.");
     return {
       success: true,
-      message: "Logistics manifest generated. Order broadcasted to active regional drivers.",
-      orderId: newOrder._id,
-      pricingDetails: newOrder.pricing
+      orderId: newOrderDocument._id
     };
   } catch (error) {
-    console.error("Parts order creation lifecycle aborted:", error);
+    console.error("\u274C [Order API CRASH] Ingestion Pipeline Failed:", error.message);
     throw createError({
       statusCode: 500,
-      message: error.message || "Failed to process delivery request manifest."
+      message: `Database or event stream registration fault: ${error.message}`
     });
   }
 });
@@ -4317,6 +4437,54 @@ const create_post = defineEventHandler(async (event) => {
 const create_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: create_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const PartsOrder$2 = PartsOrderImport;
+const pickupJob_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const { orderId } = body;
+  if (!orderId) {
+    throw createError({
+      statusCode: 400,
+      message: "Missing transaction parameters. orderId required."
+    });
+  }
+  try {
+    const updatedOrder = await PartsOrder$2.findOneAndUpdate(
+      {
+        _id: new mongoose.Types.ObjectId(orderId),
+        status: "accepted"
+        // Guard clause: can only pick up an accepted order
+      },
+      {
+        $set: {
+          status: "in_transit",
+          updatedAt: /* @__PURE__ */ new Date()
+        }
+      },
+      { returnDocument: "after" }
+    );
+    if (!updatedOrder) {
+      throw createError({
+        statusCode: 400,
+        message: "Order cannot be picked up. Invalid status transition."
+      });
+    }
+    console.log(`\u{1F4E6} [Logistics Core] Order ${orderId} is now IN TRANSIT on the road.`);
+    EventHub.sendToBuyer(orderId, "status_update", { status: "in_transit" });
+    return { success: true, status: updatedOrder.status };
+  } catch (error) {
+    console.error("\u274C Failed to transition order to transit state:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || "Internal logistics processing fault."
+    });
+  }
+});
+
+const pickupJob_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: pickupJob_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const PartsOrder$1 = PartsOrderImport;
@@ -4414,6 +4582,59 @@ const index_get = defineEventHandler(async (event) => {
 const index_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: index_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const stream_get = defineEventHandler(async (event) => {
+  await connectDB();
+  const query = getQuery$1(event);
+  const role = query.role;
+  const id = query.id;
+  if (!role || !id) {
+    throw createError({
+      statusCode: 400,
+      message: "Missing streaming registration parameters (role and id required)."
+    });
+  }
+  setHeaders(event, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache, no-transform",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
+    // Absolute requirement to stop Nginx from swallowing chunks
+    "Content-Encoding": "none"
+    // Prevents compression wrappers from blocking real-time delivery
+  });
+  const stream = new ReadableStream({
+    start(controller) {
+      if (role === "driver") {
+        EventHub.registerDriver(id, controller);
+      } else if (role === "buyer") {
+        EventHub.registerBuyer(id, controller);
+      }
+      const initialPayload = `event: connected
+data: ${JSON.stringify({ status: "online" })}
+
+`;
+      controller.enqueue(new TextEncoder().encode(initialPayload));
+      const heartbeatInterval = setInterval(() => {
+        try {
+          controller.enqueue(new TextEncoder().encode(": heartbeat\n\n"));
+        } catch (err) {
+          clearInterval(heartbeatInterval);
+        }
+      }, 1e4);
+      event.node.req.on("close", () => {
+        clearInterval(heartbeatInterval);
+        EventHub.unregister(id);
+      });
+    }
+  });
+  return sendStream(event, stream);
+});
+
+const stream_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: stream_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function renderPayloadResponse(ssrContext) {

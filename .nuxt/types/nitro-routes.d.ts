@@ -66,11 +66,17 @@ declare module "nitropack/types" {
     '/api/orders/create': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/create.post').default>>>>
     }
+    '/api/orders/pickup-job': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/pickup-job.post').default>>>>
+    }
     '/api/orders/track-:id': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/track-[id].get').default>>>>
     }
     '/api/orders/track/:id': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/orders/track/[id]/index.get').default>>>>
+    }
+    '/api/stream': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/stream.get').default>>>>
     }
     '/__nuxt_error': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>

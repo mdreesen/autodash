@@ -1,10 +1,13 @@
 import type { Model } from 'mongoose'
 import PartsOrderImport from '../../database/models/PartsOrder'
+import { connectDB } from "../../database/mongodb";
 
 const PartsOrder = PartsOrderImport as Model<any>
 
 export default defineEventHandler(async (event) => {
   try {
+    await connectDB();
+
     // 1. Fetch live unassigned records from MongoDB Atlas
     const activeOffers = await PartsOrder.find({ 
       status: 'placed',

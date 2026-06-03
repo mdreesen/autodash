@@ -4,6 +4,7 @@
  */
 import type { Model } from 'mongoose'
 import PartsOrderImport from '../../database/models/PartsOrder'
+import { connectDB } from "../../database/mongodb";
 
 const PartsOrder = PartsOrderImport as Model<any>
 
@@ -19,6 +20,8 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
+    await connectDB();
+
     // 2. Fetch all orders waiting for a pickup, sorted by newest first
     const openOrders = await PartsOrder.find({ status: 'placed' })
       .sort({ createdAt: -1 })

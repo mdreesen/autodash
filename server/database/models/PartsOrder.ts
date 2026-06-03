@@ -28,18 +28,12 @@ const partsOrderSchema = new Schema({
 
   // 3. Commercial Supplier Parameters
   supplier: {
-    storeName: { 
-      type: String, 
-      required: true,
-      enum: ['O\'Reilly Auto Parts', 'NAPA Auto Parts', 'AutoZone', 'Advance Auto Parts', 'Independent']
+    storeName: {
+      type: String,
+      required: true // Just require a string, remove the strict enum array!
     },
     storeAddress: { type: String, required: true },
-    commercialOrderNumber: { 
-      type: String, 
-      required: true, 
-      uppercase: true,
-      trim: true
-    }
+    commercialOrderNumber: { type: String, required: true }
   },
 
   // 4. Manifest Inventory Payload

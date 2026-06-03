@@ -1,4 +1,5 @@
 declare global {
+  const EventHub: typeof import('../../server/utils/eventHub').EventHub
   const H3Error: typeof import('../../node_modules/h3').H3Error
   const H3Event: typeof import('../../node_modules/h3').H3Event
   const __buildAssetsURL: typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/utils/paths').buildAssetsURL
@@ -147,3 +148,4 @@ export { defineTask, runTask } from 'nitropack/runtime/internal/task';
 export { defineNitroErrorHandler } from 'nitropack/runtime/internal/error/utils';
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from '/Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from '/Users/mdreesen/Documents/Programming/business-projects/autodash/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
+export { EventHub } from '/Users/mdreesen/Documents/Programming/business-projects/autodash/server/utils/eventHub';
