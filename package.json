@@ -5,7 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "mobile:sync": "nuxt generate && npm run build && npx cap sync",
+    "mobile:sync": "npm run generate && npx cap sync",
     "dev:ios": "npx cap open ios",
     "dev:android": "npx cap open android",
     "generate": "nuxt generate",
@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.3.4",
-    "@capacitor/cli": "^8.3.4",
-    "@capacitor/core": "^8.3.4",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/ios": "^8.3.4",
     "@nuxtjs/tailwindcss": "^6.14.0",
@@ -28,6 +28,7 @@
     "vue-router": "^5.0.7"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6"
+    "@types/bcryptjs": "^2.4.6",
+    "typescript": "^6.0.3"
   }
 }
