@@ -28,6 +28,7 @@ declare global {
   const destinationShops: typeof import('../../app/utils/mockLocations').destinationShops
   const effect: typeof import('vue').effect
   const effectScope: typeof import('vue').effectScope
+  const formatDate: typeof import('../../app/utils/date').formatDate
   const getAppManifest: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getAppManifest
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
@@ -236,6 +237,7 @@ declare module 'vue' {
     readonly destinationShops: UnwrapRef<typeof import('../../app/utils/mockLocations')['destinationShops']>
     readonly effect: UnwrapRef<typeof import('vue')['effect']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
+    readonly formatDate: UnwrapRef<typeof import('../../app/utils/date')['formatDate']>
     readonly getAppManifest: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>

@@ -1,9 +1,10 @@
-<!--
-  AUTODASH COMMERCIAL BUYER DISPATCH SYSTEM DASHBOARD
-  PAGES/BUYER/DASHBOARD.VUE
--->
 <script setup>
 import { ref, onMounted } from 'vue'
+import { formatDate } from '~/utils/date';
+
+definePageMeta({
+  layout: 'buyer',
+});
 
 const dashboardData = ref({ live: [], history: [] })
 const isLoading = ref(true)
@@ -22,11 +23,6 @@ async function fetchBuyerFleetMetrics() {
   }
 }
 
-function formatDate(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
-}
-
 onMounted(() => {
   fetchBuyerFleetMetrics()
 })
@@ -34,22 +30,6 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-gray-50/60 pb-24 text-gray-900 font-sans">
-    
-    <!-- APPLICATION NAVIGATION STICKY HEADER -->
-    <header class="p-4 bg-white border-b border-gray-100 sticky top-0 z-50 flex items-center justify-between shadow-xs">
-      <div>
-        <h1 class="text-base font-black tracking-tight text-gray-900">Fleet Operations</h1>
-        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider mt-0.5">Commercial Workshop Console</p>
-      </div>
-      
-      <!-- New Hot Shot Dispatch Order Button Link -->
-      <button 
-        @click="$router.push('/buyer/order')"
-        class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-colors"
-      >
-        + Request Parts Run
-      </button>
-    </header>
 
     <main class="max-w-md mx-auto p-4 space-y-6">
       

@@ -1,4 +1,4 @@
-export type LayoutKey = "authenticated" | "default"
+export type LayoutKey = "auth-driver" | "authenticated" | "buyer" | "default"
 declare module 'nitropack' {
   interface NitroRouteConfig {
     appLayout?: LayoutKey | false

@@ -1,0 +1,1 @@
+import{_ as n}from"./DlAUqK2U.js";import{f as r,z as t,A as a,D as s,a1 as c}from"./B-7NAI5i.js";const l={};function _(e,f){const o=r("NavigationBuyer");return t(),a("main",null,[s(o),c(e.$slots,"default")])}const u=n(l,[["render",_]]);export{u as default};

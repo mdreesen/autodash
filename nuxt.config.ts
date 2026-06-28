@@ -16,6 +16,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: 'static',
     experimental: { tasks: true },
     tasks: {
       'lead:reminders': { handler: './server/tasks/lead/reminders' }
